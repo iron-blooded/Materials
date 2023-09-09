@@ -1,0 +1,5 @@
+name: Materials
+version: '${project.version}'
+main: org.hg.materials.Materials
+api-version: '1.18'
+authors: [Filabdict]
