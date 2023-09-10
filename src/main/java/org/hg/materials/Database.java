@@ -1,5 +1,8 @@
 package org.hg.materials;
 
+import org.bukkit.inventory.ItemStack;
+import org.hg.materials.attributes.Attributes;
+
 import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
@@ -25,7 +28,7 @@ public class Database {
             e.printStackTrace();
         }
     }
-    public void addValue(Object item, Object attributes) {
+    public void addValue(ItemStack item, Attributes attributes) {
         String sql = "INSERT OR REPLACE INTO materials (item, attributes) VALUES (?, ?)";
         try {
             PreparedStatement stmt = connection.prepareStatement(sql);
@@ -35,7 +38,7 @@ public class Database {
             stmt.close();
         } catch (Exception e) {}
     }
-    public Object getValue(Object item){
+    public Attributes getValue(ItemStack item){
         String sql = "SELECT attributes FROM materials WHERE item=?";
         try {
             PreparedStatement stmt = connection.prepareStatement(sql);
@@ -44,21 +47,21 @@ public class Database {
             if (rs.next()) {
                 rs.close();
                 stmt.close();
-                return rs.getInt("attributes");
+                return (Attributes) rs.getObject("attributes");
             }
             rs.close();
             stmt.close();
         } catch (Exception e){}
         return null;
     }
-    public ArrayList<Object> getAllValues(){
-        ArrayList<Object> items = new ArrayList<>();
+    public ArrayList<ItemStack> getAllValues(){
+        ArrayList<ItemStack> items = new ArrayList<>();
         try {
             String sql = "SELECT item FROM materials";
             PreparedStatement stmt = connection.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                items.add(rs.getObject("item"));
+                items.add((ItemStack) rs.getObject("item"));
             }
             rs.close();
             stmt.close();
