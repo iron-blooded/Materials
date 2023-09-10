@@ -27,12 +27,14 @@ public class ListItems implements InventoryHolder, Listener {
     private int page;
     private ItemStack left = createFlag(true);
     private ItemStack right = createFlag(false);
+    private ItemStack add_item = new ItemStack(Material.SUNFLOWER);
     private Materials plugin;
     public ListItems(Materials plugin, int page){
         this.page = page;
         this.plugin = plugin;
         setDisplayName(left, ChatColor.AQUA+"На страницу назад");
         setDisplayName(right, ChatColor.AQUA+"На страницу вперед");
+        setDisplayName(add_item, ChatColor.YELLOW+"Добавить материал");
     }
 
     @Override
@@ -49,6 +51,7 @@ public class ListItems implements InventoryHolder, Listener {
             inventory.setItem(i, list.get(i).getItem());
         }
         inventory.setItem(50, right);
+        inventory.setItem(49, add_item);
         inventory.setItem(48, left);
         return inventory;
     }
@@ -66,6 +69,8 @@ public class ListItems implements InventoryHolder, Listener {
                 player.openInventory(new ListItems(plugin,((ListItems) inventory.getHolder()).page+1).getInventory());
             } else if (itemStack.equals(left)) {
                 player.openInventory(new ListItems(plugin,((ListItems) inventory.getHolder()).page-1).getInventory());
+            } else if (itemStack.equals(add_item)) {
+                player.openInventory(new AddItem().getInventory());
             }
         }
     }
