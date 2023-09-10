@@ -8,11 +8,12 @@ import org.hg.materials.comands.open_material_list;
 import org.hg.materials.inventory_holders.AddItem;
 
 public final class Materials extends JavaPlugin implements Listener {
-
+    public Database database;
     @Override
     public void onEnable() {
         // Plugin startup logic
-        Bukkit.getServer().getPluginManager().registerEvents(new AddItem(), this);
+        database = new Database(this);
+        Bukkit.getServer().getPluginManager().registerEvents(new AddItem(this), this);
         getCommand("open_material_list").setExecutor(new open_material_list(this));
         getCommand("add_item").setExecutor(new add_item(this));
     }
