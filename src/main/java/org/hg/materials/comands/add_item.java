@@ -17,7 +17,7 @@ public class add_item implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         Player player = (Player) commandSender;
-        player.openInventory(new AddItem().getInventory());
+        player.openInventory(new AddItem(plugin).getInventory());
         return true;
     }
 }
