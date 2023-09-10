@@ -51,7 +51,7 @@ public class AddItem implements InventoryHolder, Listener {
             if (slot == 13) {
                 inventory.setItem(13, event.getCursor());
             } else if (slot == 38) {
-                event.getWhoClicked().closeInventory(); // отказ от добавления
+                event.getWhoClicked().openInventory(new ListItems(plugin, 0).getInventory());
             } else if (slot == 42 && !(item == null || item.getType().isAir())) {
                 plugin.database.addValue(item, new Attributes()); // согласие на добавление
                 item.setAmount(0);
