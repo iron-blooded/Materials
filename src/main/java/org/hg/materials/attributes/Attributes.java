@@ -13,8 +13,8 @@ public class Attributes {
         attribute = new HashMap<>();
         enchantment = new HashMap<>();
     }
-    public Attributes(String str){
-        Attributes attributes = new Gson().fromJson(str, Attributes.class);
+    public Attributes(String serialize){
+        Attributes attributes = new Gson().fromJson(serialize, Attributes.class);
         this.attribute = attributes.attribute;
         this.enchantment = attributes.enchantment;
     }
