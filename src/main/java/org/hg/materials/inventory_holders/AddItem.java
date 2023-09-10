@@ -44,7 +44,7 @@ public class AddItem implements InventoryHolder, Listener {
     @EventHandler
     public void onClick(InventoryClickEvent event){
         Inventory inventory = event.getClickedInventory();
-        if (inventory.getHolder() instanceof AddItem){
+        if (inventory != null && inventory.getHolder() instanceof AddItem){
             event.setCancelled(true);
             int slot = event.getSlot();
             ItemStack item = inventory.getItem(13);

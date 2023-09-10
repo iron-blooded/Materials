@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.hg.materials.Materials;
 import org.hg.materials.inventory_holders.AddItem;
+import org.hg.materials.inventory_holders.ListItems;
 
 public class open_material_list implements CommandExecutor {
     private static Materials plugin;
@@ -17,6 +18,7 @@ public class open_material_list implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         Player player = (Player) commandSender;
+        player.openInventory(new ListItems(plugin,1).getInventory());
         return true;
     }
 }

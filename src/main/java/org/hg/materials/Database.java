@@ -1,5 +1,6 @@
 package org.hg.materials;
 
+import com.google.gson.Gson;
 import org.bukkit.inventory.ItemStack;
 import org.hg.materials.attributes.Attributes;
 
@@ -22,7 +23,7 @@ public class Database {
             }
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("jdbc:sqlite:" + plugin.getDataFolder() + File.separator + "database.db");
-            PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS materials (item OBJECT, attributes OBJECT, PRIMARY KEY (item))");
+            PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS materials (item STRING, attributes OBJECT, PRIMARY KEY (item))");
             statement.execute();
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
@@ -32,17 +33,17 @@ public class Database {
         String sql = "INSERT OR REPLACE INTO materials (item, attributes) VALUES (?, ?)";
         try {
             PreparedStatement stmt = connection.prepareStatement(sql);
-            stmt.setObject(1, item);
+            stmt.setString(1, new SerializeItem(item).serialize());
             stmt.setObject(2, attributes);
             stmt.executeUpdate();
             stmt.close();
-        } catch (Exception e) {}
+        } catch (Exception e) {e.printStackTrace();}
     }
     public Attributes getValue(ItemStack item){
         String sql = "SELECT attributes FROM materials WHERE item=?";
         try {
             PreparedStatement stmt = connection.prepareStatement(sql);
-            stmt.setObject(1, item);
+            stmt.setString(1, new SerializeItem(item).serialize());
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 rs.close();
@@ -54,18 +55,18 @@ public class Database {
         } catch (Exception e){}
         return null;
     }
-    public ArrayList<ItemStack> getAllValues(){
-        ArrayList<ItemStack> items = new ArrayList<>();
+    public ArrayList<SerializeItem> getAllValues(){
+        ArrayList<SerializeItem> items = new ArrayList<>();
         try {
             String sql = "SELECT item FROM materials";
             PreparedStatement stmt = connection.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                items.add((ItemStack) rs.getObject("item"));
+            while (rs.next()) {
+                items.add(new SerializeItem(rs.getString("item")));
             }
             rs.close();
             stmt.close();
-        } catch (Exception e){}
+        } catch (Exception e){e.printStackTrace();}
         return items;
     }
 }
