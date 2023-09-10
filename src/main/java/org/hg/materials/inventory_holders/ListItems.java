@@ -35,18 +35,16 @@ public class ListItems implements InventoryHolder, Listener {
         setDisplayName(right, ChatColor.AQUA+"На страницу вперед");
     }
 
-    public ListItems(Materials plugin) {
-        this.plugin = plugin;
-    }
-
     @Override
     public Inventory getInventory() {
         Inventory inventory = Bukkit.createInventory(this, 54, ChatColor.DARK_AQUA+"Список материалов");
         List<SerializeItem> list = plugin.database.getAllValues();
         int page = this.page -1;
-        if (list.size() > 45) {
-            list = list.subList(page * 45, page * 45 + 45);
+        if (page<0 || page > list.size()/45){
+            page = 0;
+            this.page = 1;
         }
+        list = list.subList(Math.min(page * 45, list.size()-1), Math.min(page * 45 + 45, list.size()-1));
         for (int i = 0; i <= 45 && i < list.size(); i++){
             inventory.setItem(i, list.get(i).getItem());
         }
@@ -61,9 +59,13 @@ public class ListItems implements InventoryHolder, Listener {
             event.setCancelled(true);
             ItemStack itemStack = event.getCurrentItem();
             Player player = (Player) event.getWhoClicked();
-            if (itemStack!=null&& itemStack.equals(right)){
-                player.closeInventory();
+            if (itemStack==null){
+                return;
+            }
+            if (itemStack.equals(right)){
                 player.openInventory(new ListItems(plugin,((ListItems) inventory.getHolder()).page+1).getInventory());
+            } else if (itemStack.equals(left)) {
+                player.openInventory(new ListItems(plugin,((ListItems) inventory.getHolder()).page-1).getInventory());
             }
         }
     }

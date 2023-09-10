@@ -54,6 +54,8 @@ public class AddItem implements InventoryHolder, Listener {
                 event.getWhoClicked().closeInventory(); // отказ от добавления
             } else if (slot == 42 && !(item == null || item.getType().isAir())) {
                 plugin.database.addValue(item, new Attributes()); // согласие на добавление
+                item.setAmount(0);
+                event.getWhoClicked().sendMessage(ChatColor.GREEN+"Материал успешно добавлен!");
             }
         }
     }

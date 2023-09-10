@@ -17,7 +17,7 @@ public final class Materials extends JavaPlugin implements Listener {
         // Plugin startup logic
         database = new Database(this);
         Bukkit.getServer().getPluginManager().registerEvents(new AddItem(this), this);
-        Bukkit.getServer().getPluginManager().registerEvents(new ListItems(this), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new ListItems(this, 0), this);
         getCommand("open_material_list").setExecutor(new open_material_list(this));
         getCommand("add_item").setExecutor(new add_item(this));
     }
