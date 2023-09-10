@@ -22,11 +22,13 @@ public class AddItem implements InventoryHolder, Listener {
     ItemStack accept = new ItemStack(Material.LIME_CONCRETE);
     ItemStack deny = new ItemStack(Material.RED_CONCRETE);
     private static Materials plugin;
-    public AddItem(Materials plugin){
-        this.plugin = plugin;
+    public AddItem(){
         setDisplayName(target, ChatColor.YELLOW+"Положите в центр материал!");
         setDisplayName(accept, ChatColor.GREEN+"Подтвердить добавление материала");
         setDisplayName(deny, ChatColor.RED+"Отклонить добавление материала");
+    }
+    public AddItem(Materials plugin){
+        this.plugin = plugin;
     }
     @Override
     public Inventory getInventory() {
