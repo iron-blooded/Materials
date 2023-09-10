@@ -2,6 +2,7 @@ package org.hg.materials;
 
 import com.google.gson.Gson;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.hg.materials.attributes.Attributes;
 
 import java.io.File;
@@ -29,7 +30,7 @@ public class Database {
             e.printStackTrace();
         }
     }
-    public void addValue(ItemStack item, Attributes attributes) {
+    public void addValue(@NonNull ItemStack item, @NonNull Attributes attributes) {
         String sql = "INSERT OR REPLACE INTO materials (item, attributes) VALUES (?, ?)";
         try {
             PreparedStatement stmt = connection.prepareStatement(sql);
