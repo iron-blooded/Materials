@@ -54,7 +54,7 @@ public class Database {
             rs.close();
             stmt.close();
         } catch (Exception e){}
-        return null;
+        return new Attributes();
     }
     public ArrayList<SerializeItem> getAllValues(){
         ArrayList<SerializeItem> items = new ArrayList<>();
