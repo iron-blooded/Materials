@@ -22,13 +22,11 @@ public class AddItem implements InventoryHolder, Listener {
     ItemStack accept = new ItemStack(Material.LIME_CONCRETE);
     ItemStack deny = new ItemStack(Material.RED_CONCRETE);
     private static Materials plugin;
-    public AddItem(){
+    public AddItem(Materials plugin){
+        this.plugin = plugin;
         setDisplayName(target, ChatColor.YELLOW+"Положите в центр материал!");
         setDisplayName(accept, ChatColor.GREEN+"Подтвердить добавление материала");
         setDisplayName(deny, ChatColor.RED+"Отклонить добавление материала");
-    }
-    public AddItem(Materials plugin){
-        this.plugin = plugin;
     }
     @Override
     public Inventory getInventory() {
@@ -48,14 +46,17 @@ public class AddItem implements InventoryHolder, Listener {
             event.setCancelled(true);
             int slot = event.getSlot();
             ItemStack item = inventory.getItem(13);
-            if (slot == 13) {
-                inventory.setItem(13, event.getCursor());
-            } else if (slot == 38) {
+            ItemStack itemSlot = event.getCurrentItem();
+            if (itemSlot == null){}
+            else if (itemSlot.equals(deny)) {
                 event.getWhoClicked().openInventory(new ListItems(plugin, 0).getInventory());
-            } else if (slot == 42 && !(item == null || item.getType().isAir())) {
+            } else if (itemSlot.equals(accept) && item != null) {
                 plugin.database.addValue(item, new Attributes()); // согласие на добавление
                 item.setAmount(0);
                 event.getWhoClicked().sendMessage(ChatColor.GREEN+"Материал успешно добавлен!");
+            }
+            if (slot == 13) {
+                inventory.setItem(13, event.getCursor());
             }
         }
     }

@@ -46,7 +46,9 @@ public class ListItems implements InventoryHolder, Listener {
             page = 0;
             this.page = 1;
         }
-        list = list.subList(Math.min(page * 45, list.size()-1), Math.min(page * 45 + 45, list.size()-1));
+        if (!list.isEmpty()) {
+            list = list.subList(Math.min(page * 45, list.size() - 1), Math.min(page * 45 + 45, list.size()));
+        }
         for (int i = 0; i <= 45 && i < list.size(); i++){
             inventory.setItem(i, list.get(i).getItem());
         }
@@ -70,7 +72,7 @@ public class ListItems implements InventoryHolder, Listener {
             } else if (itemStack.equals(left)) {
                 player.openInventory(new ListItems(plugin,((ListItems) inventory.getHolder()).page-1).getInventory());
             } else if (itemStack.equals(add_item)) {
-                player.openInventory(new AddItem().getInventory());
+                player.openInventory(new AddItem(plugin).getInventory());
             }
         }
     }
