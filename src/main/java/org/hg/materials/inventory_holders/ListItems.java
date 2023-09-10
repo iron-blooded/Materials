@@ -73,6 +73,8 @@ public class ListItems implements InventoryHolder, Listener {
                 player.openInventory(new ListItems(plugin,((ListItems) inventory.getHolder()).page-1).getInventory());
             } else if (itemStack.equals(add_item)) {
                 player.openInventory(new AddItem(plugin).getInventory());
+            } else {
+                player.openInventory(new EditItem(plugin, itemStack).getInventory());
             }
         }
     }
