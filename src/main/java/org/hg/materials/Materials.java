@@ -1,14 +1,10 @@
 package org.hg.materials;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.hg.materials.comands.open_material_list;
-import org.hg.materials.inventory_holders.AddItem;
-import org.hg.materials.inventory_holders.EditItem;
-import org.hg.materials.inventory_holders.ListItems;
+import org.hg.materials.inventory_holders.*;
 
 import java.sql.SQLException;
 
@@ -21,6 +17,8 @@ public final class Materials extends JavaPlugin implements Listener {
         Bukkit.getServer().getPluginManager().registerEvents(new AddItem(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new EditItem(this, null), this);
         Bukkit.getServer().getPluginManager().registerEvents(new ListItems(this, 0), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new ListAttributes(this, null), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new EditAttribute(this, null, null), this);
         getCommand("open_material_list").setExecutor(new open_material_list(this));
     }
 

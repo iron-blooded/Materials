@@ -1,0 +1,217 @@
+package org.hg.materials.inventory_holders;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.hg.materials.Materials;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+
+public class EditAttribute implements InventoryHolder, Listener {
+    private Materials plugin;
+    ItemStack item;
+    HashMap<Attribute, AttributeModifier> attributes;
+    Attribute select_attribute = Attribute.GENERIC_ATTACK_DAMAGE;
+    EquipmentSlot equipment_slot = EquipmentSlot.HAND;
+    double value = 1;
+    String str_value = "1";
+    ItemStack trackpoint;
+    ItemStack confirm = new ItemStack(Material.GREEN_CONCRETE);
+    ItemStack cancel = new ItemStack(Material.RED_CONCRETE);
+    public EditAttribute(Materials plugin, ItemStack item, HashMap<Attribute, AttributeModifier> attributes){
+        this.plugin = plugin;
+        this.item = item;
+        this.attributes = attributes;
+        this.trackpoint = new trackpoint().create(this);
+        setDisplayName(confirm, ChatColor.GREEN+"Применить изменения");
+        setDisplayName(cancel, ChatColor.RED+"Отменить изменения");
+    }
+    @Override
+    public Inventory getInventory() {
+        Inventory inventory = Bukkit.createInventory(this, 54, ChatColor.DARK_AQUA+"Изменение атрибута");
+        int i = 0;
+        for (Attribute attribute: Attribute.values()){
+            if (i == 11){
+                i += 5;
+            }
+            if (this.select_attribute.equals(attribute)){
+                inventory.setItem(i, new type().select(attribute));
+            }else {
+                inventory.setItem(i, new type().unselect(attribute));
+            }
+            i++;
+        }
+        i = 4+9;
+        for (EquipmentSlot equipmentSlot: EquipmentSlot.values()){
+            if (i == 4+9+1){
+                i += 6;
+            }
+            if (this.equipment_slot.equals(equipmentSlot)){
+                inventory.setItem(i, new equipment().selected(equipmentSlot));
+            } else {
+                inventory.setItem(i, new equipment().unselected(equipmentSlot));
+            }
+            i++;
+        }
+        this.trackpoint = new trackpoint().create(this);
+        inventory.setItem(4+9*4, trackpoint);
+        inventory.setItem(2+9*5, cancel);
+        inventory.setItem(6+9*5, confirm);
+        return inventory;
+    }
+    @EventHandler
+    public void onClick(InventoryClickEvent event) {
+        Inventory inventory = event.getClickedInventory();
+        if (inventory != null && inventory.getHolder() instanceof EditAttribute) {
+            event.setCancelled(true);
+            ItemStack itemStack = event.getCurrentItem();
+            Player player = (Player) event.getWhoClicked();
+            EditAttribute inventoryHolder = (EditAttribute) inventory.getHolder();
+            if (itemStack == null){
+                return;
+            } else if (new type().is(itemStack)) {
+                for (Attribute attribute: itemStack.getItemMeta().getAttributeModifiers().keySet()) {
+                    inventoryHolder.select_attribute = attribute;
+                }
+                player.openInventory(inventoryHolder.getInventory());
+            } else if (new equipment().is(itemStack)) {
+                for (AttributeModifier attributeModifier: itemStack.getItemMeta().getAttributeModifiers().values()){
+                    inventoryHolder.equipment_slot = attributeModifier.getSlot();
+                }
+                player.openInventory(inventoryHolder.getInventory());
+            } else if (new trackpoint().is(itemStack)){
+                int num = event.getHotbarButton()+1;
+                if (num > 0){
+                    new trackpoint().addNumber(num, inventoryHolder);
+                } else if (event.getClick() == ClickType.LEFT) {
+                    new trackpoint().backspace(inventoryHolder);
+                } else if (event.getClick() == ClickType.RIGHT) {
+                    new trackpoint().addPoint(inventoryHolder);
+                } else if (event.getClick() == ClickType.SHIFT_LEFT) {
+                    new trackpoint().addNumber(0, inventoryHolder);
+                }
+                player.openInventory(inventoryHolder.getInventory());
+            } else if (itemStack.equals(cancel)) {
+                player.openInventory(new ListAttributes(plugin, inventoryHolder.item, inventoryHolder.attributes).getInventory());
+            } else if (itemStack.equals(confirm)) {
+                try{
+                    inventoryHolder.value = Double.parseDouble(inventoryHolder.str_value);
+                } catch (Exception e){
+                    player.sendMessage(ChatColor.RED+"Неверное число!");
+                    return;
+                }
+                inventoryHolder.attributes.put(inventoryHolder.select_attribute, new AttributeModifier(UUID.randomUUID(), inventoryHolder.select_attribute.name(), inventoryHolder.value, AttributeModifier.Operation.ADD_NUMBER, inventoryHolder.equipment_slot));
+                player.openInventory(new ListAttributes(plugin, inventoryHolder.item, inventoryHolder.attributes).getInventory());
+            }
+        }
+    }
+    private class trackpoint{
+        public boolean is(ItemStack itemStack){
+            return itemStack.getType().equals(Material.TURTLE_EGG);
+        }
+        public ItemStack create(EditAttribute holder){
+            ItemStack itemStack = new ItemStack(Material.TURTLE_EGG);
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            List<String> lore = new ArrayList<>();
+            lore.add(ChatColor.YELLOW+"Как пользоваться:");
+            lore.add(ChatColor.YELLOW+"Наводись сюда и тыкай цифры на клавиатуре");
+            lore.add(ChatColor.YELLOW+"Что бы написать ноль, нажми SHIFT + ЛКМ");
+            lore.add(ChatColor.YELLOW+"Что бы стереть, нажми левую кнопку мыши");
+            lore.add(ChatColor.YELLOW+"Что бы поставить точку, нажми правую кнопку мыши");
+            itemMeta.setLore(lore);
+            itemMeta.setDisplayName(ChatColor.AQUA+str_value);
+            itemStack.setItemMeta(itemMeta);
+            return itemStack;
+        }
+        public void addNumber(int number, EditAttribute holder){
+            holder.str_value = holder.str_value + number;
+        }
+        public void backspace(EditAttribute holder){
+            try {
+                holder.str_value = holder.str_value.substring(0, holder.str_value.length() - 1);
+            } catch (Exception e){}
+        }
+        public void addPoint(EditAttribute holder){
+            if (!holder.str_value.contains(".")) {
+                holder.str_value = holder.str_value + ".";
+            }
+        }
+
+    }
+    private class equipment{
+        public boolean is(ItemStack itemStack){
+            return itemStack.getType().equals(Material.HONEY_BLOCK) || itemStack.getType().equals(Material.SLIME_BLOCK);
+        }
+        public ItemStack unselected(EquipmentSlot equipmentSlot){
+            ItemStack itemStack = new ItemStack(Material.HONEY_BLOCK);
+            setDisplayName(itemStack, ChatColor.GOLD+"Выберите нужный тип слота (рука, броня)");
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            Multimap<Attribute, AttributeModifier> multimap = ArrayListMultimap.create();
+            AttributeModifier attributeModifier = new AttributeModifier(UUID.randomUUID(), select_attribute.name(), value, AttributeModifier.Operation.ADD_NUMBER, equipmentSlot);
+            multimap.put(select_attribute, attributeModifier);
+            itemMeta.setAttributeModifiers(multimap);
+            itemStack.setItemMeta(itemMeta);
+            return itemStack;
+        }
+        public ItemStack selected(EquipmentSlot equipmentSlot){
+            ItemStack itemStack = new ItemStack(Material.SLIME_BLOCK);
+            setDisplayName(itemStack, ChatColor.GOLD+"Выбран данный тип слота");
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            Multimap<Attribute, AttributeModifier> multimap = ArrayListMultimap.create();
+            AttributeModifier attributeModifier = new AttributeModifier(UUID.randomUUID(), select_attribute.name(), value, AttributeModifier.Operation.ADD_NUMBER, equipmentSlot);
+            multimap.put(select_attribute, attributeModifier);
+            itemMeta.setAttributeModifiers(multimap);
+            itemStack.setItemMeta(itemMeta);
+            return itemStack;
+        }
+    }
+    private class type {
+        public boolean is(ItemStack itemStack){
+            return itemStack.getType().name().contains("_CANDLE");
+        }
+        public ItemStack unselect(Attribute attribute){
+            ItemStack itemStack = new ItemStack(Material.RED_CANDLE);
+            setDisplayName(itemStack, ChatColor.GOLD+"Выберите нужный тип атрибута");
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            Multimap<Attribute, AttributeModifier> multimap = ArrayListMultimap.create();
+            AttributeModifier attributeModifier = new AttributeModifier(UUID.randomUUID(), attribute.name(), value, AttributeModifier.Operation.ADD_NUMBER, equipment_slot);
+            multimap.put(attribute, attributeModifier);
+            itemMeta.setAttributeModifiers(multimap);
+            itemStack.setItemMeta(itemMeta);
+            return itemStack;
+        }
+        public ItemStack select(Attribute attribute){
+            ItemStack itemStack = new ItemStack(Material.GREEN_CANDLE);
+            setDisplayName(itemStack, ChatColor.GOLD+"Выбран данный тип атрибута");
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            Multimap<Attribute, AttributeModifier> multimap = ArrayListMultimap.create();
+            AttributeModifier attributeModifier = new AttributeModifier(UUID.randomUUID(), attribute.name(), value, AttributeModifier.Operation.ADD_NUMBER, equipment_slot);
+            multimap.put(attribute, attributeModifier);
+            itemMeta.setAttributeModifiers(multimap);
+            itemStack.setItemMeta(itemMeta);
+            return itemStack;
+        }
+    }
+    private static void setDisplayName(ItemStack itemStack, String name){
+        ItemMeta itemMeta= itemStack.getItemMeta();
+        itemMeta.setDisplayName(name);
+        itemStack.setItemMeta(itemMeta);
+    }
+}

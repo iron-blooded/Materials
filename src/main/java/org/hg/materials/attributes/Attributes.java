@@ -1,13 +1,16 @@
 package org.hg.materials.attributes;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 
 import java.util.HashMap;
 
 public class Attributes {
-    public HashMap<Attribute, Float> attribute;
+    public HashMap<Attribute, AttributeModifier> attribute;
     public HashMap<Enchantment, Integer> enchantment;
     public Attributes(){
         attribute = new HashMap<>();
