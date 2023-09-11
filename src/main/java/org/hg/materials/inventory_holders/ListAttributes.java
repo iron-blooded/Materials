@@ -18,6 +18,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.hg.materials.Materials;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class ListAttributes implements InventoryHolder, Listener {
     private Materials plugin;
@@ -25,14 +26,14 @@ public class ListAttributes implements InventoryHolder, Listener {
     ItemStack accept = new ItemStack(Material.GREEN_CONCRETE);
     ItemStack deny = new ItemStack(Material.RED_CONCRETE);
     ItemStack add_attribute = new ItemStack(Material.SUNFLOWER);
-    HashMap<Attribute, AttributeModifier> attributes;
+    Multimap<Attribute, AttributeModifier> attributes;
     public ListAttributes(Materials plugin, ItemStack item){
         ListAttributes(plugin, item, plugin.database.getValue(item).attribute);
     }
-    public ListAttributes(Materials plugin, ItemStack item, HashMap<Attribute, AttributeModifier> attributes){
+    public ListAttributes(Materials plugin, ItemStack item, Multimap<Attribute, AttributeModifier> attributes){
         ListAttributes(plugin, item, attributes);
     }
-    private void ListAttributes(Materials plugin, ItemStack item, HashMap<Attribute, AttributeModifier> attributes){
+    private void ListAttributes(Materials plugin, ItemStack item, Multimap<Attribute, AttributeModifier> attributes){
         this.plugin = plugin;
         this.item = item;
         setDisplayName(accept, ChatColor.GREEN+"Подтвердить изменение атрибутов");
@@ -45,15 +46,17 @@ public class ListAttributes implements InventoryHolder, Listener {
         Inventory inventory = Bukkit.createInventory(this, 45, ChatColor.DARK_AQUA+"Список атрибутов");
         int i = 0;
         for (Attribute attribute: attributes.keySet()){
-            ItemStack itemStack = new ItemStack(Material.EXPERIENCE_BOTTLE);
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            itemMeta.setDisplayName(ChatColor.WHITE+attribute.name());
-            Multimap<Attribute, AttributeModifier> multimap = ArrayListMultimap.create();
-            multimap.put(attribute, attributes.get(attribute));
-            itemMeta.setAttributeModifiers(multimap);
-            itemStack.setItemMeta(itemMeta);
-            inventory.setItem(i, itemStack);
-            i++;
+            for (AttributeModifier attribute_modifier :attributes.get(attribute)) {
+                ItemStack itemStack = new ItemStack(Material.EXPERIENCE_BOTTLE);
+                ItemMeta itemMeta = itemStack.getItemMeta();
+                itemMeta.setDisplayName(ChatColor.WHITE + attribute.name());
+                Multimap<Attribute, AttributeModifier> multimap = ArrayListMultimap.create();
+                multimap.put(attribute, attribute_modifier);
+                itemMeta.setAttributeModifiers(multimap);
+                itemStack.setItemMeta(itemMeta);
+                inventory.setItem(i, itemStack);
+                i++;
+            }
         }
         inventory.setItem(42, accept);
         inventory.setItem(40, add_attribute);
@@ -64,19 +67,20 @@ public class ListAttributes implements InventoryHolder, Listener {
     public void onClick(InventoryClickEvent event) {
         Inventory inventory = event.getClickedInventory();
         if (inventory != null && inventory.getHolder() instanceof ListAttributes) {
-            event.setCancelled(false);
+            event.setCancelled(true);
             ItemStack itemStack = event.getCurrentItem();
             Player player = (Player) event.getWhoClicked();
+            ListAttributes holder = (ListAttributes) inventory.getHolder();
             if (itemStack == null){
                 return;
             } else if (itemStack.equals(deny)) {
-                player.openInventory(new EditItem(plugin, item).getInventory());
+                player.openInventory(new EditItem(plugin, holder.item).getInventory());
             } else if (itemStack.equals(accept)) {
 
             } else if (itemStack.equals(add_attribute)) {
-                player.openInventory(new EditAttribute(plugin, item, attributes).getInventory());
-            } else {
-
+                player.openInventory(new EditAttribute(plugin, holder.item, holder.attributes).getInventory());
+            } else if (itemStack.getType() == Material.EXPERIENCE_BOTTLE) {
+                player.openInventory(new EditAttribute(plugin, holder.item, holder.attributes, itemStack.getItemMeta().getAttributeModifiers()).getInventory());
             }
         }
     }

@@ -27,21 +27,40 @@ import java.util.UUID;
 public class EditAttribute implements InventoryHolder, Listener {
     private Materials plugin;
     ItemStack item;
-    HashMap<Attribute, AttributeModifier> attributes;
+    Multimap<Attribute, AttributeModifier> attributes;
     Attribute select_attribute = Attribute.GENERIC_ATTACK_DAMAGE;
+    Multimap<Attribute, AttributeModifier> editing_attribute = null;
     EquipmentSlot equipment_slot = EquipmentSlot.HAND;
     double value = 1;
-    String str_value = "1";
+    String str_value;
     ItemStack trackpoint;
     ItemStack confirm = new ItemStack(Material.GREEN_CONCRETE);
     ItemStack cancel = new ItemStack(Material.RED_CONCRETE);
-    public EditAttribute(Materials plugin, ItemStack item, HashMap<Attribute, AttributeModifier> attributes){
+    public EditAttribute(Materials plugin, ItemStack item, Multimap<Attribute, AttributeModifier> attributes, Multimap<Attribute, AttributeModifier> editing_attribute){
+        init(plugin, item, attributes, editing_attribute);
+    }
+    public EditAttribute(Materials plugin, ItemStack item, Multimap<Attribute, AttributeModifier> attributes){
+        init(plugin, item, attributes, null);
+    }
+    private void init(Materials plugin, ItemStack item, Multimap<Attribute, AttributeModifier> attributes, Multimap<Attribute, AttributeModifier> editing_attribute){
         this.plugin = plugin;
         this.item = item;
         this.attributes = attributes;
         this.trackpoint = new trackpoint().create(this);
+        this.editing_attribute = editing_attribute;
+        if (editing_attribute != null){
+            for (Attribute attribute :editing_attribute.keySet()) {
+                this.select_attribute = attribute;
+                for (AttributeModifier attributeModifier : editing_attribute.get(attribute)) {
+                    this.equipment_slot = attributeModifier.getSlot();
+                    this.value = attributeModifier.getAmount();
+                }
+            }
+        }
+        this.str_value = String.valueOf(value);
         setDisplayName(confirm, ChatColor.GREEN+"Применить изменения");
         setDisplayName(cancel, ChatColor.RED+"Отменить изменения");
+
     }
     @Override
     public Inventory getInventory() {
@@ -83,42 +102,54 @@ public class EditAttribute implements InventoryHolder, Listener {
             event.setCancelled(true);
             ItemStack itemStack = event.getCurrentItem();
             Player player = (Player) event.getWhoClicked();
-            EditAttribute inventoryHolder = (EditAttribute) inventory.getHolder();
+            EditAttribute holder = (EditAttribute) inventory.getHolder();
             if (itemStack == null){
                 return;
             } else if (new type().is(itemStack)) {
                 for (Attribute attribute: itemStack.getItemMeta().getAttributeModifiers().keySet()) {
-                    inventoryHolder.select_attribute = attribute;
+                    holder.select_attribute = attribute;
                 }
-                player.openInventory(inventoryHolder.getInventory());
+                player.openInventory(holder.getInventory());
             } else if (new equipment().is(itemStack)) {
                 for (AttributeModifier attributeModifier: itemStack.getItemMeta().getAttributeModifiers().values()){
-                    inventoryHolder.equipment_slot = attributeModifier.getSlot();
+                    holder.equipment_slot = attributeModifier.getSlot();
                 }
-                player.openInventory(inventoryHolder.getInventory());
+                player.openInventory(holder.getInventory());
             } else if (new trackpoint().is(itemStack)){
                 int num = event.getHotbarButton()+1;
                 if (num > 0){
-                    new trackpoint().addNumber(num, inventoryHolder);
+                    new trackpoint().addNumber(num, holder);
                 } else if (event.getClick() == ClickType.LEFT) {
-                    new trackpoint().backspace(inventoryHolder);
-                } else if (event.getClick() == ClickType.RIGHT) {
-                    new trackpoint().addPoint(inventoryHolder);
+                    new trackpoint().backspace(holder);
                 } else if (event.getClick() == ClickType.SHIFT_LEFT) {
-                    new trackpoint().addNumber(0, inventoryHolder);
+                    new trackpoint().addPoint(holder);
+                } else if (event.getClick() == ClickType.RIGHT) {
+                    new trackpoint().addNumber(0, holder);
                 }
-                player.openInventory(inventoryHolder.getInventory());
-            } else if (itemStack.equals(cancel)) {
-                player.openInventory(new ListAttributes(plugin, inventoryHolder.item, inventoryHolder.attributes).getInventory());
-            } else if (itemStack.equals(confirm)) {
                 try{
-                    inventoryHolder.value = Double.parseDouble(inventoryHolder.str_value);
+                    holder.value = Double.parseDouble(holder.str_value);
                 } catch (Exception e){
                     player.sendMessage(ChatColor.RED+"Неверное число!");
+                }
+                player.openInventory(holder.getInventory());
+            } else if (itemStack.equals(cancel)) {
+                player.openInventory(new ListAttributes(plugin, holder.item, holder.attributes).getInventory());
+            } else if (itemStack.equals(confirm)) {
+                try{
+                    holder.value = Double.parseDouble(holder.str_value);
+                } catch (Exception e){
+                    player.sendMessage(ChatColor.RED+""+ChatColor.BOLD+"Неверное число!");
                     return;
                 }
-                inventoryHolder.attributes.put(inventoryHolder.select_attribute, new AttributeModifier(UUID.randomUUID(), inventoryHolder.select_attribute.name(), inventoryHolder.value, AttributeModifier.Operation.ADD_NUMBER, inventoryHolder.equipment_slot));
-                player.openInventory(new ListAttributes(plugin, inventoryHolder.item, inventoryHolder.attributes).getInventory());
+                if (holder.editing_attribute != null) {
+                    for (Attribute attribute :holder.editing_attribute.keySet()) {
+                        for (AttributeModifier attributeModifier : holder.editing_attribute.get(attribute)) {
+                            holder.attributes.remove(attribute, attributeModifier);
+                        }
+                    }
+                }
+                holder.attributes.put(holder.select_attribute, new AttributeModifier(plugin.uuid, holder.select_attribute.name(), holder.value, AttributeModifier.Operation.ADD_NUMBER, holder.equipment_slot));
+                player.openInventory(new ListAttributes(plugin, holder.item, holder.attributes).getInventory());
             }
         }
     }
@@ -131,12 +162,16 @@ public class EditAttribute implements InventoryHolder, Listener {
             ItemMeta itemMeta = itemStack.getItemMeta();
             List<String> lore = new ArrayList<>();
             lore.add(ChatColor.YELLOW+"Как пользоваться:");
-            lore.add(ChatColor.YELLOW+"Наводись сюда и тыкай цифры на клавиатуре");
-            lore.add(ChatColor.YELLOW+"Что бы написать ноль, нажми SHIFT + ЛКМ");
+            lore.add(ChatColor.RED+"Наводись сюда и тыкай цифры на клавиатуре");
+            lore.add(ChatColor.YELLOW+"Что бы написать ноль, нажми правую кнопку мыши");
             lore.add(ChatColor.YELLOW+"Что бы стереть, нажми левую кнопку мыши");
-            lore.add(ChatColor.YELLOW+"Что бы поставить точку, нажми правую кнопку мыши");
+            lore.add(ChatColor.YELLOW+"Что бы поставить точку, нажми SHIFT + ЛКМ");
             itemMeta.setLore(lore);
             itemMeta.setDisplayName(ChatColor.AQUA+str_value);
+            Multimap<Attribute, AttributeModifier> multimap = ArrayListMultimap.create();
+            AttributeModifier attributeModifier = new AttributeModifier(plugin.uuid, holder.select_attribute.name(), value, AttributeModifier.Operation.ADD_NUMBER, holder.equipment_slot);
+            multimap.put(holder.select_attribute, attributeModifier);
+            itemMeta.setAttributeModifiers(multimap);
             itemStack.setItemMeta(itemMeta);
             return itemStack;
         }
@@ -164,7 +199,7 @@ public class EditAttribute implements InventoryHolder, Listener {
             setDisplayName(itemStack, ChatColor.GOLD+"Выберите нужный тип слота (рука, броня)");
             ItemMeta itemMeta = itemStack.getItemMeta();
             Multimap<Attribute, AttributeModifier> multimap = ArrayListMultimap.create();
-            AttributeModifier attributeModifier = new AttributeModifier(UUID.randomUUID(), select_attribute.name(), value, AttributeModifier.Operation.ADD_NUMBER, equipmentSlot);
+            AttributeModifier attributeModifier = new AttributeModifier(plugin.uuid, select_attribute.name(), value, AttributeModifier.Operation.ADD_NUMBER, equipmentSlot);
             multimap.put(select_attribute, attributeModifier);
             itemMeta.setAttributeModifiers(multimap);
             itemStack.setItemMeta(itemMeta);
@@ -175,7 +210,7 @@ public class EditAttribute implements InventoryHolder, Listener {
             setDisplayName(itemStack, ChatColor.GOLD+"Выбран данный тип слота");
             ItemMeta itemMeta = itemStack.getItemMeta();
             Multimap<Attribute, AttributeModifier> multimap = ArrayListMultimap.create();
-            AttributeModifier attributeModifier = new AttributeModifier(UUID.randomUUID(), select_attribute.name(), value, AttributeModifier.Operation.ADD_NUMBER, equipmentSlot);
+            AttributeModifier attributeModifier = new AttributeModifier(plugin.uuid, select_attribute.name(), value, AttributeModifier.Operation.ADD_NUMBER, equipmentSlot);
             multimap.put(select_attribute, attributeModifier);
             itemMeta.setAttributeModifiers(multimap);
             itemStack.setItemMeta(itemMeta);
@@ -191,7 +226,7 @@ public class EditAttribute implements InventoryHolder, Listener {
             setDisplayName(itemStack, ChatColor.GOLD+"Выберите нужный тип атрибута");
             ItemMeta itemMeta = itemStack.getItemMeta();
             Multimap<Attribute, AttributeModifier> multimap = ArrayListMultimap.create();
-            AttributeModifier attributeModifier = new AttributeModifier(UUID.randomUUID(), attribute.name(), value, AttributeModifier.Operation.ADD_NUMBER, equipment_slot);
+            AttributeModifier attributeModifier = new AttributeModifier(plugin.uuid, attribute.name(), value, AttributeModifier.Operation.ADD_NUMBER, equipment_slot);
             multimap.put(attribute, attributeModifier);
             itemMeta.setAttributeModifiers(multimap);
             itemStack.setItemMeta(itemMeta);
@@ -202,7 +237,7 @@ public class EditAttribute implements InventoryHolder, Listener {
             setDisplayName(itemStack, ChatColor.GOLD+"Выбран данный тип атрибута");
             ItemMeta itemMeta = itemStack.getItemMeta();
             Multimap<Attribute, AttributeModifier> multimap = ArrayListMultimap.create();
-            AttributeModifier attributeModifier = new AttributeModifier(UUID.randomUUID(), attribute.name(), value, AttributeModifier.Operation.ADD_NUMBER, equipment_slot);
+            AttributeModifier attributeModifier = new AttributeModifier(plugin.uuid, attribute.name(), value, AttributeModifier.Operation.ADD_NUMBER, equipment_slot);
             multimap.put(attribute, attributeModifier);
             itemMeta.setAttributeModifiers(multimap);
             itemStack.setItemMeta(itemMeta);

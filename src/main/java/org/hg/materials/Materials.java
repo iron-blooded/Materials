@@ -7,9 +7,12 @@ import org.hg.materials.comands.open_material_list;
 import org.hg.materials.inventory_holders.*;
 
 import java.sql.SQLException;
+import java.util.UUID;
 
 public final class Materials extends JavaPlugin implements Listener {
     public Database database;
+    public UUID uuid = UUID.fromString("22fa46b8-1326-4a32-a971-5dc39bd5dfa4");
+
     @Override
     public void onEnable() {
         // Plugin startup logic

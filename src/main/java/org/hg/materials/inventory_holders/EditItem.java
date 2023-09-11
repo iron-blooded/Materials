@@ -42,6 +42,7 @@ public class EditItem implements InventoryHolder, Listener {
         if (inventory != null && inventory.getHolder() instanceof EditItem) {
             event.setCancelled(true);
             ItemStack itemStack = event.getCurrentItem();
+            EditItem holder = (EditItem) inventory.getHolder();
             Player player = (Player) event.getWhoClicked();
             if (itemStack==null){
                 return;
@@ -49,7 +50,7 @@ public class EditItem implements InventoryHolder, Listener {
             if (itemStack.equals(playback)){
                 player.openInventory(new ListItems(plugin, 0).getInventory());
             } else if (itemStack.equals(attributes)) {
-                player.openInventory(new ListAttributes(plugin, item).getInventory());
+                player.openInventory(new ListAttributes(plugin, holder.item).getInventory());
             } else if (itemStack.equals(enchantments)) {
 
             }

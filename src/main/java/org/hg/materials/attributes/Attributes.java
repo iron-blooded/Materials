@@ -10,10 +10,10 @@ import org.bukkit.enchantments.Enchantment;
 import java.util.HashMap;
 
 public class Attributes {
-    public HashMap<Attribute, AttributeModifier> attribute;
+    public Multimap<Attribute, AttributeModifier> attribute;
     public HashMap<Enchantment, Integer> enchantment;
     public Attributes(){
-        attribute = new HashMap<>();
+        attribute = ArrayListMultimap.create();
         enchantment = new HashMap<>();
     }
     public Attributes(String serialize){
