@@ -35,6 +35,7 @@ public class EditAttribute implements InventoryHolder, Listener {
     ItemStack trackpoint;
     ItemStack confirm = new ItemStack(Material.GREEN_CONCRETE);
     ItemStack cancel = new ItemStack(Material.RED_CONCRETE);
+    ItemStack delete = new ItemStack(Material.TNT);
     public EditAttribute(Materials plugin, ItemStack item, Attributes attributes, Multimap<Attribute, AttributeModifier> editing_attribute){
         init(plugin, item, attributes, editing_attribute);
     }
@@ -59,7 +60,7 @@ public class EditAttribute implements InventoryHolder, Listener {
         this.str_value = String.valueOf(value);
         setDisplayName(confirm, ChatColor.GREEN+"Применить изменения");
         setDisplayName(cancel, ChatColor.RED+"Отменить изменения");
-
+        setDisplayName(delete, ChatColor.RED+""+ChatColor.BOLD+"Удалить атрибут");
     }
     @Override
     public Inventory getInventory() {
@@ -92,6 +93,9 @@ public class EditAttribute implements InventoryHolder, Listener {
         inventory.setItem(4+9*4, trackpoint);
         inventory.setItem(2+9*5, cancel);
         inventory.setItem(6+9*5, confirm);
+        if (this.editing_attribute != null) {
+            inventory.setItem(6 + 9 * 5 + 2, delete);
+        }
         return inventory;
     }
     @EventHandler
@@ -134,6 +138,15 @@ public class EditAttribute implements InventoryHolder, Listener {
                 }
                 player.openInventory(holder.getInventory());
             } else if (itemStack.equals(cancel)) {
+                player.openInventory(new ListAttributes(plugin, holder.item, holder.attributes).getInventory());
+            } else if (itemStack.equals(delete)) {
+                if (holder.editing_attribute != null) {
+                    for (Attribute attribute :holder.editing_attribute.keySet()) {
+                        for (AttributeModifier attributeModifier : holder.editing_attribute.get(attribute)) {
+                            holder.attributes.attribute.remove(attribute, attributeModifier);
+                        }
+                    }
+                }
                 player.openInventory(new ListAttributes(plugin, holder.item, holder.attributes).getInventory());
             } else if (itemStack.equals(confirm)) {
                 try{
