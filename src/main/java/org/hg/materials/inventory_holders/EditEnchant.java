@@ -39,7 +39,7 @@ public class EditEnchant implements InventoryHolder, Listener {
     ItemStack trackpoint;
     ItemStack confirm = new ItemStack(Material.GREEN_CONCRETE);
     ItemStack cancel = new ItemStack(Material.RED_CONCRETE);
-    ItemStack delete = new ItemStack(Material.FIRE);
+    ItemStack delete = new ItemStack(Material.TNT);
     ItemStack page_left = createFlag(true);
     ItemStack page_right = createFlag(false);
     int page = 1;
@@ -90,6 +90,9 @@ public class EditEnchant implements InventoryHolder, Listener {
             inventory.setItem(i, itemStack);
 
         }
+        if (this.editing_enchant != null) {
+            inventory.setItem(53, delete);
+        }
         inventory.setItem(51, confirm);
         inventory.setItem(50, page_right);
         inventory.setItem(49, new trackpoint().create(this));
@@ -109,6 +112,12 @@ public class EditEnchant implements InventoryHolder, Listener {
                 return;
             } else if (itemStack.equals(cancel)) {
                 player.openInventory(new ListEnchantments(plugin, holder.item, holder.attributes).getInventory());
+            } else if (itemStack.equals(delete)) {
+                 if (holder.editing_enchant!= null){
+                    for (Enchantment e :holder.editing_enchant.keySet())
+                    holder.attributes.enchantment.remove(e);
+                }
+                 player.openInventory(new ListEnchantments(plugin, holder.item, holder.attributes).getInventory());
             } else if (itemStack.equals(confirm)) {
                 if (holder.editing_enchant!= null){
                     for (Enchantment e :holder.editing_enchant.keySet())
@@ -129,9 +138,8 @@ public class EditEnchant implements InventoryHolder, Listener {
                 holder.page += 1;
                 player.openInventory(holder.getInventory());
             } else if (itemStack.getType().name().equals("BOOK")) {
-                for (Enchantment enchantment: new enchant_book().getEnchantment(itemStack).keySet()) {
-                    holder.select_enchant = enchantment;
-                }
+                for (Enchantment e: new enchant_book().getEnchantment(itemStack).keySet())
+                holder.select_enchant = e;
                 player.openInventory(holder.getInventory());
             } else if (new trackpoint().is(itemStack)) {
                 int num = event.getHotbarButton()+1;
