@@ -39,6 +39,7 @@ public class EditEnchant implements InventoryHolder, Listener {
     ItemStack trackpoint;
     ItemStack confirm = new ItemStack(Material.GREEN_CONCRETE);
     ItemStack cancel = new ItemStack(Material.RED_CONCRETE);
+    ItemStack delete = new ItemStack(Material.FIRE);
     ItemStack page_left = createFlag(true);
     ItemStack page_right = createFlag(false);
     int page = 1;
@@ -67,7 +68,7 @@ public class EditEnchant implements InventoryHolder, Listener {
         this.str_value = String.valueOf(value);
         setDisplayName(confirm, ChatColor.GREEN+"Применить изменения");
         setDisplayName(cancel, ChatColor.RED+"Отменить изменения");
-
+        setDisplayName(delete, ChatColor.RED+""+ChatColor.BOLD+"Удалить зачарование");
     }
     @Override
     public Inventory getInventory() {
@@ -107,15 +108,17 @@ public class EditEnchant implements InventoryHolder, Listener {
             if (itemStack == null) {
                 return;
             } else if (itemStack.equals(cancel)) {
-                player.openInventory(new ListEnchantments(plugin, holder.item).getInventory());
+                player.openInventory(new ListEnchantments(plugin, holder.item, holder.attributes).getInventory());
             } else if (itemStack.equals(confirm)) {
                 if (holder.editing_enchant!= null){
-                    holder.attributes.enchantment.remove(holder.select_enchant);
+                    for (Enchantment e :holder.editing_enchant.keySet())
+                    holder.attributes.enchantment.remove(e);
                 }
                 try{
                     holder.value = Integer.parseInt(holder.str_value);
                 } catch (Exception e){
                     player.sendMessage(ChatColor.RED+""+ChatColor.BOLD+"Неверный уровень зачарования!");
+                    return;
                 }
                 holder.attributes.enchantment.put(holder.select_enchant, holder.value);
                 player.openInventory(new ListEnchantments(plugin, holder.item, holder.attributes).getInventory());

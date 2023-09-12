@@ -95,7 +95,7 @@ public class ListEnchantments implements InventoryHolder, Listener {
             } else if (itemStack.equals(add_enchant)) {
                 player.openInventory(new EditEnchant(plugin, holder.item, holder.attributes).getInventory());
             } else if (itemStack.getType() == Material.ENCHANTED_BOOK) {
-                player.openInventory(new EditEnchant(plugin, holder.item, holder.attributes, new enchant_book().getEnchantment(holder.item)).getInventory());
+                player.openInventory(new EditEnchant(plugin, holder.item, holder.attributes, new enchant_book().getEnchantment(itemStack)).getInventory());
             } else if (itemStack.equals(page_left)) {
                 holder.page -= 1;
                 player.openInventory(holder.getInventory());
