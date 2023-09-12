@@ -52,7 +52,7 @@ public class EditItem implements InventoryHolder, Listener {
             } else if (itemStack.equals(attributes)) {
                 player.openInventory(new ListAttributes(plugin, holder.item).getInventory());
             } else if (itemStack.equals(enchantments)) {
-
+                player.openInventory(new ListEnchantments(plugin, holder.item).getInventory());
             }
         }
     }
