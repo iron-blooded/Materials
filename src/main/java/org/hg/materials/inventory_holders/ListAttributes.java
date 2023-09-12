@@ -16,6 +16,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.hg.materials.Materials;
+import org.hg.materials.attributes.Attributes;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,14 +27,14 @@ public class ListAttributes implements InventoryHolder, Listener {
     ItemStack accept = new ItemStack(Material.GREEN_CONCRETE);
     ItemStack deny = new ItemStack(Material.RED_CONCRETE);
     ItemStack add_attribute = new ItemStack(Material.SUNFLOWER);
-    Multimap<Attribute, AttributeModifier> attributes;
+    Attributes attributes;
     public ListAttributes(Materials plugin, ItemStack item){
-        ListAttributes(plugin, item, plugin.database.getValue(item).attribute);
+        init(plugin, item, plugin.database.getValue(item));
     }
-    public ListAttributes(Materials plugin, ItemStack item, Multimap<Attribute, AttributeModifier> attributes){
-        ListAttributes(plugin, item, attributes);
+    public ListAttributes(Materials plugin, ItemStack item, Attributes attributes){
+        init(plugin, item, attributes);
     }
-    private void ListAttributes(Materials plugin, ItemStack item, Multimap<Attribute, AttributeModifier> attributes){
+    private void init(Materials plugin, ItemStack item, Attributes attributes){
         this.plugin = plugin;
         this.item = item;
         setDisplayName(accept, ChatColor.GREEN+"Подтвердить изменение атрибутов");
@@ -45,8 +46,8 @@ public class ListAttributes implements InventoryHolder, Listener {
     public Inventory getInventory() {
         Inventory inventory = Bukkit.createInventory(this, 45, ChatColor.DARK_AQUA+"Список атрибутов");
         int i = 0;
-        for (Attribute attribute: attributes.keySet()){
-            for (AttributeModifier attribute_modifier :attributes.get(attribute)) {
+        for (Attribute attribute: attributes.attribute.keySet()){
+            for (AttributeModifier attribute_modifier :attributes.attribute.get(attribute)) {
                 ItemStack itemStack = new ItemStack(Material.EXPERIENCE_BOTTLE);
                 ItemMeta itemMeta = itemStack.getItemMeta();
                 itemMeta.setDisplayName(ChatColor.WHITE + attribute.name());
@@ -76,7 +77,8 @@ public class ListAttributes implements InventoryHolder, Listener {
             } else if (itemStack.equals(deny)) {
                 player.openInventory(new EditItem(plugin, holder.item).getInventory());
             } else if (itemStack.equals(accept)) {
-
+                plugin.database.addValue(holder.item, holder.attributes);
+                player.openInventory(new EditItem(plugin, holder.item).getInventory());
             } else if (itemStack.equals(add_attribute)) {
                 player.openInventory(new EditAttribute(plugin, holder.item, holder.attributes).getInventory());
             } else if (itemStack.getType() == Material.EXPERIENCE_BOTTLE) {

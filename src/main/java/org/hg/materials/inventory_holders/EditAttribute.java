@@ -18,16 +18,15 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.hg.materials.Materials;
+import org.hg.materials.attributes.Attributes;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 public class EditAttribute implements InventoryHolder, Listener {
     private Materials plugin;
     ItemStack item;
-    Multimap<Attribute, AttributeModifier> attributes;
+    Attributes attributes;
     Attribute select_attribute = Attribute.GENERIC_ATTACK_DAMAGE;
     Multimap<Attribute, AttributeModifier> editing_attribute = null;
     EquipmentSlot equipment_slot = EquipmentSlot.HAND;
@@ -36,13 +35,13 @@ public class EditAttribute implements InventoryHolder, Listener {
     ItemStack trackpoint;
     ItemStack confirm = new ItemStack(Material.GREEN_CONCRETE);
     ItemStack cancel = new ItemStack(Material.RED_CONCRETE);
-    public EditAttribute(Materials plugin, ItemStack item, Multimap<Attribute, AttributeModifier> attributes, Multimap<Attribute, AttributeModifier> editing_attribute){
+    public EditAttribute(Materials plugin, ItemStack item, Attributes attributes, Multimap<Attribute, AttributeModifier> editing_attribute){
         init(plugin, item, attributes, editing_attribute);
     }
-    public EditAttribute(Materials plugin, ItemStack item, Multimap<Attribute, AttributeModifier> attributes){
+    public EditAttribute(Materials plugin, ItemStack item, Attributes attributes){
         init(plugin, item, attributes, null);
     }
-    private void init(Materials plugin, ItemStack item, Multimap<Attribute, AttributeModifier> attributes, Multimap<Attribute, AttributeModifier> editing_attribute){
+    private void init(Materials plugin, ItemStack item, Attributes attributes, Multimap<Attribute, AttributeModifier> editing_attribute){
         this.plugin = plugin;
         this.item = item;
         this.attributes = attributes;
@@ -144,11 +143,11 @@ public class EditAttribute implements InventoryHolder, Listener {
                 if (holder.editing_attribute != null) {
                     for (Attribute attribute :holder.editing_attribute.keySet()) {
                         for (AttributeModifier attributeModifier : holder.editing_attribute.get(attribute)) {
-                            holder.attributes.remove(attribute, attributeModifier);
+                            holder.attributes.attribute.remove(attribute, attributeModifier);
                         }
                     }
                 }
-                holder.attributes.put(holder.select_attribute, new AttributeModifier(plugin.uuid, holder.select_attribute.name(), holder.value, AttributeModifier.Operation.ADD_NUMBER, holder.equipment_slot));
+                holder.attributes.attribute.put(holder.select_attribute, new AttributeModifier(plugin.uuid, holder.select_attribute.name(), holder.value, AttributeModifier.Operation.ADD_NUMBER, holder.equipment_slot));
                 player.openInventory(new ListAttributes(plugin, holder.item, holder.attributes).getInventory());
             }
         }

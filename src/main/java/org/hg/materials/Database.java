@@ -1,8 +1,6 @@
 package org.hg.materials;
 
-import com.google.gson.Gson;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.hg.materials.attributes.Attributes;
 
 import java.io.File;
@@ -24,18 +22,18 @@ public class Database {
             }
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("jdbc:sqlite:" + plugin.getDataFolder() + File.separator + "database.db");
-            PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS materials (item STRING, attributes OBJECT, PRIMARY KEY (item))");
+            PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS materials (item STRING, attributes STRING, PRIMARY KEY (item))");
             statement.execute();
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
     }
-    public void addValue(@NonNull ItemStack item, @NonNull Attributes attributes) {
+    public void addValue(ItemStack item, Attributes attributes) {
         String sql = "INSERT OR REPLACE INTO materials (item, attributes) VALUES (?, ?)";
         try {
             PreparedStatement stmt = connection.prepareStatement(sql);
             stmt.setString(1, new SerializeItem(item).serialize());
-            stmt.setObject(2, attributes);
+            stmt.setObject(2, attributes.serialize());
             stmt.executeUpdate();
             stmt.close();
         } catch (Exception e) {e.printStackTrace();}
@@ -46,14 +44,12 @@ public class Database {
             PreparedStatement stmt = connection.prepareStatement(sql);
             stmt.setString(1, new SerializeItem(item).serialize());
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                rs.close();
-                stmt.close();
-                return (Attributes) rs.getObject("attributes");
+            while (rs.next()) {
+                return new Attributes(rs.getString("attributes"));
             }
             rs.close();
             stmt.close();
-        } catch (Exception e){}
+        } catch (Exception e){e.printStackTrace();}
         return new Attributes();
     }
     public ArrayList<SerializeItem> getAllValues(){

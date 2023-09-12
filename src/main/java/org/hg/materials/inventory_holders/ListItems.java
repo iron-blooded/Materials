@@ -18,9 +18,7 @@ import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.hg.materials.Materials;
 import org.hg.materials.SerializeItem;
-import org.hg.materials.attributes.Attributes;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ListItems implements InventoryHolder, Listener {
