@@ -21,6 +21,8 @@ import org.hg.materials.SerializeItem;
 
 import java.util.List;
 
+import static org.hg.materials.Materials.createFlag;
+
 public class ListItems implements InventoryHolder, Listener {
     private int page;
     private ItemStack left = createFlag(true);
@@ -75,25 +77,6 @@ public class ListItems implements InventoryHolder, Listener {
                 player.openInventory(new EditItem(plugin, itemStack).getInventory());
             }
         }
-    }
-    public static ItemStack createFlag(boolean left) {
-        // Создаем ItemStack с типом GRAY_BANNER
-        ItemStack flag = new ItemStack(Material.GRAY_BANNER);
-        ItemMeta meta = flag.getItemMeta();
-        BannerMeta bannerMeta = (BannerMeta) meta;
-        if (left) {
-            bannerMeta.addPattern(new Pattern(DyeColor.ORANGE, PatternType.STRIPE_LEFT));
-        } else {
-            bannerMeta.addPattern(new Pattern(DyeColor.ORANGE, PatternType.STRIPE_RIGHT));
-        }
-        bannerMeta.addPattern(new Pattern(DyeColor.GRAY, PatternType.CURLY_BORDER));
-        bannerMeta.addPattern(new Pattern(DyeColor.GRAY, PatternType.STRIPE_BOTTOM));
-        bannerMeta.addPattern(new Pattern(DyeColor.GRAY, PatternType.STRIPE_TOP));
-        bannerMeta.addPattern(new Pattern(DyeColor.ORANGE, PatternType.STRIPE_MIDDLE));
-        bannerMeta.addPattern(new Pattern(DyeColor.GRAY, PatternType.CURLY_BORDER));
-        bannerMeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-        flag.setItemMeta(bannerMeta);
-        return flag;
     }
     private void setDisplayName(ItemStack itemStack, String name){
         ItemMeta itemMeta= itemStack.getItemMeta();
