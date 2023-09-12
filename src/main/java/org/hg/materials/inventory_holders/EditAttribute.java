@@ -124,6 +124,8 @@ public class EditAttribute implements InventoryHolder, Listener {
                     new trackpoint().addPoint(holder);
                 } else if (event.getClick() == ClickType.RIGHT) {
                     new trackpoint().addNumber(0, holder);
+                } else if (event.getClick() == ClickType.DROP) {
+                    new trackpoint().invert(holder);
                 }
                 try{
                     holder.value = Double.parseDouble(holder.str_value);
@@ -165,6 +167,7 @@ public class EditAttribute implements InventoryHolder, Listener {
             lore.add(ChatColor.YELLOW+"Что бы написать ноль, нажми правую кнопку мыши");
             lore.add(ChatColor.YELLOW+"Что бы стереть, нажми левую кнопку мыши");
             lore.add(ChatColor.YELLOW+"Что бы поставить точку, нажми SHIFT + ЛКМ");
+            lore.add(ChatColor.YELLOW+"Что бы инвертировать значение, нажми Q (выбрось)");
             itemMeta.setLore(lore);
             itemMeta.setDisplayName(ChatColor.AQUA+str_value);
             Multimap<Attribute, AttributeModifier> multimap = ArrayListMultimap.create();
@@ -186,6 +189,11 @@ public class EditAttribute implements InventoryHolder, Listener {
             if (!holder.str_value.contains(".")) {
                 holder.str_value = holder.str_value + ".";
             }
+        }
+        public void invert(EditAttribute holder){
+            try {
+                holder.str_value = String.valueOf(Double.parseDouble(holder.str_value)*-1);
+            } catch (Exception e){}
         }
 
     }
