@@ -1,4 +1,4 @@
-package org.hg.materials.inventory_holders;
+package org.hg.materials.inventory_holders.materials_list;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;

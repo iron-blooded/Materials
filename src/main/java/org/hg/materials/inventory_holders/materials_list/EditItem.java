@@ -1,4 +1,4 @@
-package org.hg.materials.inventory_holders;
+package org.hg.materials.inventory_holders.materials_list;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

@@ -14,7 +14,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.hg.materials.comands.open_material_list;
 import org.hg.materials.comands.test;
-import org.hg.materials.inventory_holders.*;
+import org.hg.materials.inventory_holders.materials_list.*;
 
 import java.sql.SQLException;
 import java.util.UUID;

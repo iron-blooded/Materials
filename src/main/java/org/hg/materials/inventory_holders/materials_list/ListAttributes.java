@@ -1,4 +1,4 @@
-package org.hg.materials.inventory_holders;
+package org.hg.materials.inventory_holders.materials_list;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -17,9 +17,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.hg.materials.Materials;
 import org.hg.materials.attributes.Attributes;
-
-import java.util.HashMap;
-import java.util.List;
 
 public class ListAttributes implements InventoryHolder, Listener {
     private Materials plugin;
