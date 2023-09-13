@@ -20,18 +20,21 @@ public class EditItem implements InventoryHolder, Listener {
     ItemStack playback = new ItemStack(Material.RED_CONCRETE);
     ItemStack enchantments = new ItemStack(Material.ENCHANTED_BOOK);
     ItemStack attributes = new ItemStack(Material.EXPERIENCE_BOTTLE);
+    ItemStack delete = new ItemStack(Material.TNT);
     public EditItem(Materials plugin, ItemStack itemStack){
         this.item = itemStack;
         this.plugin = plugin;
         setDisplayName(playback, ChatColor.RED+"Вернуться назад");
         setDisplayName(enchantments, ChatColor.DARK_PURPLE+"Изменить зачарования");
         setDisplayName(attributes, ChatColor.GOLD+"Изменить атрибуты");
+        setDisplayName(delete, ChatColor.RED+""+ChatColor.BOLD+"Удалить предмет");
     }
     @Override
     public Inventory getInventory() {
         Inventory inventory = Bukkit.createInventory(this, InventoryType.DROPPER, ChatColor.DARK_AQUA+"Изменение материала");
         inventory.setItem(0, item);
         inventory.setItem(2, enchantments);
+        inventory.setItem(5, delete);
         inventory.setItem(6, playback);
         inventory.setItem(8, attributes);
         return inventory;
@@ -53,6 +56,9 @@ public class EditItem implements InventoryHolder, Listener {
                 player.openInventory(new ListAttributes(plugin, holder.item).getInventory());
             } else if (itemStack.equals(enchantments)) {
                 player.openInventory(new ListEnchantments(plugin, holder.item).getInventory());
+            } else if (itemStack.equals(delete)) {
+                plugin.database.deleteValue(holder.item);
+                player.openInventory(new ListItems(plugin, 0).getInventory());
             }
         }
     }

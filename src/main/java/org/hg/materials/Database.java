@@ -38,6 +38,15 @@ public class Database {
             stmt.close();
         } catch (Exception e) {e.printStackTrace();}
     }
+    public void deleteValue(ItemStack item) {
+        String sql = "DELETE FROM materials WHERE item=?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setString(1, new SerializeItem(item).serialize());
+            stmt.executeUpdate();
+            stmt.close();
+        } catch (Exception e) {e.printStackTrace();}
+    }
     public Attributes getValue(ItemStack item){
         String sql = "SELECT attributes FROM materials WHERE item=?";
         try {
