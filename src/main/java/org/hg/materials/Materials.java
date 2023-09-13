@@ -13,6 +13,7 @@ import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.hg.materials.comands.open_material_list;
+import org.hg.materials.comands.test;
 import org.hg.materials.inventory_holders.*;
 
 import java.sql.SQLException;
@@ -34,6 +35,7 @@ public final class Materials extends JavaPlugin implements Listener {
         Bukkit.getServer().getPluginManager().registerEvents(new EditAttribute(this, new ItemStack(Material.AIR), null), this);
         Bukkit.getServer().getPluginManager().registerEvents(new EditEnchant(this, new ItemStack(Material.AIR), null), this);
         getCommand("open_material_list").setExecutor(new open_material_list(this));
+        getCommand("test").setExecutor(new test(this));
     }
 
     @Override

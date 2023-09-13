@@ -6,3 +6,5 @@ authors: [Filabdict]
 commands:
   open_material_list:
     permission: op
+  test:
+    permission: op
