@@ -14,7 +14,9 @@ import java.util.UUID;
 public class SerializerAttributes implements Serializable {
     public HashMap<Map<Attribute, EquipmentSlot>, Double> attribute;
     public HashMap<String, Integer> enchantment;
+    public int limit;
     public SerializerAttributes (Attributes attributes) {
+        this.limit = attributes.limit;
         HashMap<String, Integer> enchants = new HashMap<>();
         for (Enchantment enchantment1: attributes.enchantment.keySet()){
             enchants.put(enchantment1.getName(), attributes.enchantment.get(enchantment1));
@@ -31,6 +33,7 @@ public class SerializerAttributes implements Serializable {
     }
     public Attributes getAttributes(){
         Attributes attributes = new Attributes();
+        attributes.limit = this.limit;
         HashMap<Enchantment, Integer> enchantmentIntegerHashMap = new HashMap<>();
         for (String ench: this.enchantment.keySet()){
             try {

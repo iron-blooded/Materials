@@ -9,6 +9,9 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.yaml.snakeyaml.Yaml;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -19,12 +22,14 @@ import java.util.HashMap;
 public class Attributes {
     public Multimap<Attribute, AttributeModifier> attribute = ArrayListMultimap.create();
     public HashMap<Enchantment, Integer> enchantment = new HashMap<>();
+    public int limit = 1;
     public Attributes(){
     }
     public Attributes(SerializerAttributes serializerAttributes){
         Attributes attributes = serializerAttributes.getAttributes();
         this.attribute = attributes.attribute;
         this.enchantment = attributes.enchantment;
+        this.limit = attributes.limit;
     }
     public Attributes(String serialize){
         try {
@@ -35,6 +40,7 @@ public class Attributes {
             Attributes attributes = serializerAttributes.getAttributes();
             this.attribute = attributes.attribute;
             this.enchantment = attributes.enchantment;
+            this.limit = attributes.limit;
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
             return;

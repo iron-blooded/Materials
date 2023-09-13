@@ -59,7 +59,7 @@ public class Database {
             rs.close();
             stmt.close();
         } catch (Exception e){e.printStackTrace();}
-        return new Attributes();
+        return null;
     }
     public ArrayList<SerializeItem> getAllValues(){
         ArrayList<SerializeItem> items = new ArrayList<>();

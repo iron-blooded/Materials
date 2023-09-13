@@ -11,6 +11,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
 public class SerializeItem {
@@ -39,6 +41,24 @@ public class SerializeItem {
     }
     public String serialize(){
         return new Gson().toJson(this);
+    }
+    public String hash(){
+        String input = serialize();
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedhash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder(2 * encodedhash.length);
+            for (byte b : encodedhash) {
+                hexString.append(String.format("%02x", b));
+            }
+            String hashedString = hexString.toString();
+            hashedString = hashedString.replaceAll("[^a-z0-9/._-]", "_");
+
+            return hashedString;
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
     public ItemStack getItem(){
         ItemStack itemStack = new ItemStack(material);
