@@ -52,7 +52,12 @@ public class AddItem implements InventoryHolder, Listener {
                 event.getWhoClicked().sendMessage(ChatColor.GREEN+"Материал успешно добавлен!");
             }
             if (slot == 13) {
-                inventory.setItem(13, event.getCursor());
+                ItemStack itemStack = event.getCursor();
+                if (itemStack != null) {
+                    itemStack = itemStack.clone();
+                    itemStack.setAmount(1);
+                }
+                inventory.setItem(13, itemStack);
             }
         }
     }
