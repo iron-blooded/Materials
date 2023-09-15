@@ -67,6 +67,9 @@ public class EditEnchant implements InventoryHolder, Listener {
     @Override
     public Inventory getInventory() {
         Inventory inventory = Bukkit.createInventory(this, 54, ChatColor.DARK_AQUA+"Изменение зачарования");
+        if (editing_enchant == null) {
+            inventory = Bukkit.createInventory(this, 54, ChatColor.DARK_AQUA + "Добавление зачарования");
+        }
         List<Enchantment> list = List.of(Enchantment.values());
         int page = this.page -1;
         if (page<0 || page > list.size()/45){

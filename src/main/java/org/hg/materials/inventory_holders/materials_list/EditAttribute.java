@@ -65,6 +65,9 @@ public class EditAttribute implements InventoryHolder, Listener {
     @Override
     public Inventory getInventory() {
         Inventory inventory = Bukkit.createInventory(this, 54, ChatColor.DARK_AQUA+"Изменение атрибута");
+        if (editing_attribute == null){
+            inventory = Bukkit.createInventory(this, 54, ChatColor.DARK_AQUA+"Добавление атрибута");
+        }
         int i = 0;
         for (Attribute attribute: Attribute.values()){
             if (i == 11){
