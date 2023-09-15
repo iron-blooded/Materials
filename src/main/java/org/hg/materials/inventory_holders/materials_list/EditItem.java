@@ -1,11 +1,16 @@
 package org.hg.materials.inventory_holders.materials_list;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
@@ -13,6 +18,10 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.hg.materials.Materials;
+import org.hg.materials.attributes.Attributes;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class EditItem implements InventoryHolder, Listener {
     private Materials plugin;
@@ -21,19 +30,26 @@ public class EditItem implements InventoryHolder, Listener {
     ItemStack enchantments = new ItemStack(Material.ENCHANTED_BOOK);
     ItemStack attributes = new ItemStack(Material.EXPERIENCE_BOTTLE);
     ItemStack delete = new ItemStack(Material.TNT);
+    private int value = 1;
+    private String str_value = "1";
     public EditItem(Materials plugin, ItemStack itemStack){
         this.item = itemStack;
         this.plugin = plugin;
-        setDisplayName(playback, ChatColor.RED+"Вернуться назад");
-        setDisplayName(enchantments, ChatColor.DARK_PURPLE+"Изменить зачарования");
-        setDisplayName(attributes, ChatColor.GOLD+"Изменить атрибуты");
-        setDisplayName(delete, ChatColor.RED+""+ChatColor.BOLD+"Удалить предмет");
+        setDisplayName(playback, ChatColor.RED + "Вернуться назад");
+        setDisplayName(enchantments, ChatColor.DARK_PURPLE + "Изменить зачарования");
+        setDisplayName(attributes, ChatColor.GOLD + "Изменить атрибуты");
+        setDisplayName(delete, ChatColor.RED + "" + ChatColor.BOLD + "Удалить предмет");
+            if (itemStack != null && itemStack.getType() != Material.AIR) {
+            this.value = plugin.database.getValue(item).limit;
+            this.str_value = ""+this.value;
+        }
     }
     @Override
     public Inventory getInventory() {
         Inventory inventory = Bukkit.createInventory(this, InventoryType.DROPPER, ChatColor.DARK_AQUA+"Изменение материала");
         inventory.setItem(0, item);
         inventory.setItem(2, enchantments);
+        inventory.setItem(4, new trackpoint().create(this));
         inventory.setItem(5, delete);
         inventory.setItem(6, playback);
         inventory.setItem(8, attributes);
@@ -59,8 +75,58 @@ public class EditItem implements InventoryHolder, Listener {
             } else if (itemStack.equals(delete)) {
                 plugin.database.deleteValue(holder.item);
                 player.openInventory(new ListItems(plugin, 0).getInventory());
+            } else if (new trackpoint().is(itemStack)) {
+                int num = event.getHotbarButton()+1;
+                if (num > 0){
+                    new trackpoint().addNumber(num, holder);
+                } else if (event.getClick() == ClickType.LEFT) {
+                    new trackpoint().backspace(holder);
+                } else if (event.getClick() == ClickType.RIGHT) {
+                    new trackpoint().addNumber(0, holder);
+                }
+                try{
+                    holder.value = Integer.parseInt(holder.str_value);
+                    Attributes attributes1= plugin.database.getValue(holder.item);
+                    attributes1.limit = holder.value;
+                    plugin.database.addValue(holder.item, attributes1);
+                } catch (Exception e){
+                    player.sendMessage(ChatColor.RED+"Неверное число!");
+                }
+                player.openInventory(holder.getInventory());
             }
         }
+    }
+    private class trackpoint{
+        public boolean is(ItemStack itemStack){
+            return itemStack.getType().equals(Material.TURTLE_EGG);
+        }
+        public ItemStack create(EditItem holder){
+            ItemStack itemStack = new ItemStack(Material.TURTLE_EGG);
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            List<String> lore = new ArrayList<>();
+            lore.add(ChatColor.YELLOW+"Как пользоваться:");
+            lore.add(ChatColor.RED+"Наводись сюда и тыкай цифры на клавиатуре");
+            lore.add(ChatColor.YELLOW+"Что бы написать ноль, нажми правую кнопку мыши");
+            lore.add(ChatColor.YELLOW+"Что бы стереть, нажми левую кнопку мыши");
+            itemMeta.setLore(lore);
+            itemMeta.setDisplayName(ChatColor.AQUA+"Макс. кол-во наложений материала: "+str_value);
+            itemStack.setItemMeta(itemMeta);
+            return itemStack;
+        }
+        public void addNumber(int number, EditItem holder){
+            holder.str_value = holder.str_value + number;
+        }
+        public void backspace(EditItem holder){
+            try {
+                holder.str_value = holder.str_value.substring(0, holder.str_value.length() - 1);
+            } catch (Exception e){}
+        }
+        public void invert(EditItem holder){
+            try {
+                holder.str_value = String.valueOf(Integer.parseInt(holder.str_value)*-1);
+            } catch (Exception e){}
+        }
+
     }
     private void setDisplayName(ItemStack itemStack, String name){
         ItemMeta itemMeta= itemStack.getItemMeta();
