@@ -37,6 +37,20 @@ public class UpgradingItem {
         }
     }
 
+    public List<SerializeItem> getApplyMaterials(){
+        List<SerializeItem> list = new ArrayList<>();
+        ItemMeta itemMeta = this.item.getItemMeta();
+        ArrayList<SerializeItem> database_items = plugin.database.getAllValues();
+        for (NamespacedKey key :itemMeta.getPersistentDataContainer().getKeys()){
+            for (SerializeItem serializeItems : database_items){
+                if (serializeItems.hash().equals(key.getKey())){
+                    list.add(serializeItems);
+                }
+            }
+        }
+        return list;
+    }
+
     public ItemStack getItem() {
         if (item == null){
             return new ItemStack(Material.AIR);
