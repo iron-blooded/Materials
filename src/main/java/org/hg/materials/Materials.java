@@ -14,8 +14,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.hg.materials.comands.apply_material;
 import org.hg.materials.comands.open_material_list;
+import org.hg.materials.comands.view_apply_materials;
 import org.hg.materials.inventory_holders.apply_material.AnvilApply_L;
 import org.hg.materials.inventory_holders.materials_list.*;
+import org.hg.materials.inventory_holders.view_apply_materials.ViewApplyMaterials_L;
 
 import java.sql.SQLException;
 import java.util.UUID;
@@ -36,8 +38,10 @@ public final class Materials extends JavaPlugin implements Listener {
         Bukkit.getServer().getPluginManager().registerEvents(new EditAttribute(this, new ItemStack(Material.AIR), null), this);
         Bukkit.getServer().getPluginManager().registerEvents(new EditEnchant(this, new ItemStack(Material.AIR), null), this);
         Bukkit.getServer().getPluginManager().registerEvents(new AnvilApply_L(this), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new ViewApplyMaterials_L(), this);
         getCommand("open_material_list").setExecutor(new open_material_list(this));
         getCommand("apply_material").setExecutor(new apply_material(this));
+        getCommand("view_apply_materials").setExecutor(new view_apply_materials(this));
     }
 
     @Override

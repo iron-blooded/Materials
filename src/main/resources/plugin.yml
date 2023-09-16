@@ -8,3 +8,5 @@ commands:
     permission: op
   apply_material:
     permission: op
+  view_apply_materials:
+    permission: op
