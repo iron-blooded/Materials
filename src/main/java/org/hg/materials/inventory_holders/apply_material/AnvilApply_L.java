@@ -32,7 +32,7 @@ public class AnvilApply_L implements Listener {
             } else if (action == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
                 event.setCancelled(true);
                 return;
-            } else if (action.name().contains("PICKUP") && click_inventory == open_inventory && event.getSlot() == 2) {
+            } else if ((action.name().contains("PICKUP") || action == InventoryAction.SWAP_WITH_CURSOR) && click_inventory == open_inventory && event.getSlot() == 2) {
                 open_inventory.setItem(0, new ItemStack(Material.AIR));
                 open_inventory.setItem(1, new ItemStack(Material.AIR));
                 return;
