@@ -61,18 +61,24 @@ public class UpgradingItem {
         ItemMeta itemMeta = item.getItemMeta();
         if (itemMeta != null){
             for (ItemStack material: apply_materials) {
-                List<String> lore = itemMeta.getLore();
-                if (lore == null){
-                    lore = new ArrayList<>();
-                }
-                lore.add(ChatColor.WHITE+"Наложен: "+ChatColor.RESET+material.getItemMeta().getDisplayName());
-                itemMeta.setLore(lore);
                 int amount;
                 try {
                     amount = itemMeta.getPersistentDataContainer().get(new NamespacedKey(plugin, new SerializeItem(material).hash()), PersistentDataType.INTEGER);
                 } catch (NullPointerException e){amount = 0;} catch (Exception e){return new ItemStack(Material.AIR);}
                 Attributes attributes = plugin.database.getValue(material);
                 if (attributes != null && amount < attributes.limit) {
+                    List<String> lore = itemMeta.getLore();
+                    if (lore == null){
+                        lore = new ArrayList<>();
+                    } else {
+                        for (String l : itemMeta.getLore()) {
+                            if (l.equals(ChatColor.WHITE + "Наложен: " + material.getItemMeta().getDisplayName() + ChatColor.WHITE + " (x" + (amount) + ")")) {
+                                lore.remove(l);
+                            }
+                        }
+                    }
+                    lore.add(ChatColor.WHITE+"Наложен: "+material.getItemMeta().getDisplayName()+ChatColor.WHITE+" (x"+(amount+1)+")");
+                    itemMeta.setLore(lore);
                     for(Attribute attr : attributes.attribute.keySet()){
                         for (AttributeModifier modifier: attributes.attribute.get(attr)) {
                             double multiplier = 0;
