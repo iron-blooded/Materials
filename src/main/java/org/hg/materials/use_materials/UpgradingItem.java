@@ -45,7 +45,9 @@ public class UpgradingItem {
             for (NamespacedKey key : itemMeta.getPersistentDataContainer().getKeys()) {
                 for (SerializeItem serializeItems : database_items) {
                     if (serializeItems.hash().equals(key.getKey())) {
-                        list.add(serializeItems);
+                        for (int i = 0; i < itemMeta.getPersistentDataContainer().get(key, PersistentDataType.INTEGER).intValue(); i ++){
+                            list.add(serializeItems);
+                        }
                     }
                 }
             }
