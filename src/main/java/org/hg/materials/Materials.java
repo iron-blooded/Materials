@@ -17,6 +17,9 @@ import org.hg.materials.comands.open_material_list;
 import org.hg.materials.comands.view_apply_materials;
 import org.hg.materials.inventory_holders.apply_material.AnvilApply_L;
 import org.hg.materials.inventory_holders.materials_list.*;
+import org.hg.materials.inventory_holders.open_combining_list.CombiningList_L;
+import org.hg.materials.inventory_holders.open_combining_list.EditCombining_L;
+import org.hg.materials.inventory_holders.open_combining_list.SelectMaterialForCombing_L;
 import org.hg.materials.inventory_holders.view_apply_materials.ViewApplyMaterials_L;
 
 import java.sql.SQLException;
@@ -39,6 +42,9 @@ public final class Materials extends JavaPlugin implements Listener {
         Bukkit.getServer().getPluginManager().registerEvents(new EditEnchant(this, new ItemStack(Material.AIR), null), this);
         Bukkit.getServer().getPluginManager().registerEvents(new AnvilApply_L(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new ViewApplyMaterials_L(), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new CombiningList_L(this), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new EditCombining_L(this), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new SelectMaterialForCombing_L(), this);
         getCommand("open_material_list").setExecutor(new open_material_list(this));
         getCommand("apply_material").setExecutor(new apply_material(this));
         getCommand("view_apply_materials").setExecutor(new view_apply_materials(this));

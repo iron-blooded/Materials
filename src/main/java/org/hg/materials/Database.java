@@ -24,6 +24,8 @@ public class Database {
             connection = DriverManager.getConnection("jdbc:sqlite:" + plugin.getDataFolder() + File.separator + "database.db");
             PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS materials (item STRING, attributes STRING, PRIMARY KEY (item))");
             statement.execute();
+            statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS combining (items STRING, attributes STRING, PRIMARY KEY (items))");
+            statement.execute();
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }

@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.hg.materials.Materials;
 import org.hg.materials.attributes.Attributes;
+import org.hg.materials.inventory_holders.open_combining_list.CombiningList_H;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,7 @@ public class EditItem implements InventoryHolder, Listener {
     ItemStack enchantments = new ItemStack(Material.ENCHANTED_BOOK);
     ItemStack attributes = new ItemStack(Material.EXPERIENCE_BOTTLE);
     ItemStack delete = new ItemStack(Material.TNT);
+    ItemStack combining = new ItemStack(Material.COMPARATOR);
     private int value = 1;
     private String str_value = "1";
     public EditItem(Materials plugin, ItemStack itemStack){
@@ -39,6 +41,7 @@ public class EditItem implements InventoryHolder, Listener {
         setDisplayName(enchantments, ChatColor.DARK_PURPLE + "Изменить зачарования");
         setDisplayName(attributes, ChatColor.GOLD + "Изменить атрибуты");
         setDisplayName(delete, ChatColor.RED + "" + ChatColor.BOLD + "Удалить предмет");
+        setDisplayName(combining, ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "Изменить комбинации материалов");
             if (itemStack != null && itemStack.getType() != Material.AIR) {
             this.value = plugin.database.getValue(item).limit;
             this.str_value = ""+this.value;
@@ -48,6 +51,7 @@ public class EditItem implements InventoryHolder, Listener {
     public Inventory getInventory() {
         Inventory inventory = Bukkit.createInventory(this, InventoryType.DROPPER, ChatColor.DARK_AQUA+"Изменение материала");
         inventory.setItem(0, item);
+        inventory.setItem(1, combining);
         inventory.setItem(2, enchantments);
         inventory.setItem(4, new trackpoint().create(this));
         inventory.setItem(5, delete);
@@ -72,6 +76,8 @@ public class EditItem implements InventoryHolder, Listener {
                 player.openInventory(new ListAttributes(plugin, holder.item).getInventory());
             } else if (itemStack.equals(enchantments)) {
                 player.openInventory(new ListEnchantments(plugin, holder.item).getInventory());
+            } else if (itemStack.equals(combining)) {
+                player.openInventory(new CombiningList_H(plugin, holder.item).getInventory());
             } else if (itemStack.equals(delete)) {
                 plugin.database.deleteValue(holder.item);
                 player.openInventory(new ListItems(plugin, 0).getInventory());

@@ -10,12 +10,13 @@ import org.bukkit.util.io.BukkitObjectOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
-public class SerializeItem {
+public class SerializeItem implements Serializable {
     String itemMeta;
     Material material;
     int amount;
@@ -71,5 +72,11 @@ public class SerializeItem {
             dataInput.close();
         } catch (Exception e){}
         return itemStack;
+    }
+
+    public int compareTo(SerializeItem o) {
+        int length1 = this.itemMeta.length();
+        int length2 = o.itemMeta.length();
+        return Integer.compare(length1, length2);
     }
 }

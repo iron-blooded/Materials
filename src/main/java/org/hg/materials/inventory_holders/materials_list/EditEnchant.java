@@ -236,7 +236,7 @@ public class EditEnchant implements InventoryHolder, Listener {
         }
 
     }
-    private static void setDisplayName(ItemStack itemStack, String name){
+    public static void setDisplayName(ItemStack itemStack, String name){
         ItemMeta itemMeta= itemStack.getItemMeta();
         itemMeta.setDisplayName(name);
         itemStack.setItemMeta(itemMeta);
