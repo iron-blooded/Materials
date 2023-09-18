@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.hg.materials.Combination;
 import org.hg.materials.DatabaseComb;
 import org.hg.materials.Materials;
+import org.hg.materials.SerializeItem;
 import org.hg.materials.attributes.Attributes;
 
 import java.util.ArrayList;
@@ -26,6 +27,10 @@ public class EditCombining_L implements Listener {
             ItemStack itemStack = event.getCurrentItem();
             Player player = (Player) event.getWhoClicked();
             EditCombining_H holder = (EditCombining_H) inventory.getHolder();
+            Combination combination = new Combination(plugin);
+            combination.items.add(new SerializeItem(holder.item_editing));
+            combination.items.add(new SerializeItem(holder.item_comb));
+            combination.attributes = new DatabaseComb(plugin).getAttribute(combination);
             if (itemStack == null) {
                 return;
             } else if (itemStack.equals(holder.playback)) {
@@ -36,7 +41,7 @@ public class EditCombining_L implements Listener {
             } else if (itemStack.equals(holder.item_comb)) {
                 player.openInventory(new SelectMaterialForCombing_H(plugin, holder.item_editing, holder.item_comb).getInventory());
             } else if (itemStack.equals(holder.enchantments)) {
-
+                player.openInventory(new ListEnchantments_H(plugin, combination).getInventory());
             } else if (itemStack.equals(holder.attributes)) {
 
             }

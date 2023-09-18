@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class Combination {
     Materials plugin;
     public ArrayList<SerializeItem> items = new ArrayList<>();
-    Attributes attributes = new Attributes();
+    public Attributes attributes = new Attributes();
     public Combination(Materials plugin){
         this.plugin = plugin;
     }

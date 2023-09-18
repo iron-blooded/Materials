@@ -21,13 +21,13 @@ import static org.hg.materials.Materials.createFlag;
 
 public class ListEnchantments implements InventoryHolder, Listener {
     private Materials plugin;
-    ItemStack item;
+    public ItemStack item;
     ItemStack accept = new ItemStack(Material.GREEN_CONCRETE);
-    ItemStack deny = new ItemStack(Material.RED_CONCRETE);
+    public ItemStack deny = new ItemStack(Material.RED_CONCRETE);
     ItemStack add_enchant = new ItemStack(Material.SUNFLOWER);
     ItemStack page_left = createFlag(true);
     ItemStack page_right = createFlag(false);
-    Attributes attributes;
+    public Attributes attributes;
     int page = 1;
     public ListEnchantments(Materials plugin, ItemStack item){
         init(plugin, item, plugin.database.getValue(item), 1);
@@ -105,7 +105,7 @@ public class ListEnchantments implements InventoryHolder, Listener {
         itemMeta.setDisplayName(name);
         itemStack.setItemMeta(itemMeta);
     }
-    private class enchant_book{
+    public static class enchant_book{
         public ItemStack getBook(Enchantment enchantment, int level){
             ItemStack itemStack = new ItemStack(Material.ENCHANTED_BOOK);
             ItemMeta itemMeta = itemStack.getItemMeta();

@@ -16,7 +16,7 @@ public class DatabaseComb {
         this.plugin = plugin;
         this.connection = plugin.database.connection;
     }
-    public void addValue(Combination combination) {
+    public void setValue(Combination combination) {
         String sql = "INSERT OR REPLACE INTO combining (items, attributes) VALUES (?, ?)";
         try {
             PreparedStatement stmt = connection.prepareStatement(sql);
@@ -58,6 +58,20 @@ public class DatabaseComb {
         }
         return list;
     }
+    public Attributes getAttribute(Combination combination){
+        try {
+            String sql = "SELECT attributes FROM combining WHERE items=?";
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setString(1, combination.serializeItems());
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                return new Attributes(rs.getString("attributes"));
+            }
+            rs.close();
+            stmt.close();
+        } catch (Exception e){e.printStackTrace();}
+        return new Attributes();
+    }
     public ArrayList<Combination> getAllValues(){
         ArrayList<Combination> items = new ArrayList<>();
         try {
@@ -83,6 +97,6 @@ public class DatabaseComb {
             }
         }
         deleteValue(combination1);
-        addValue(combination2);
+        setValue(combination2);
     }
 }

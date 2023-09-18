@@ -46,7 +46,7 @@ public class CombiningList_L implements Listener {
                     Combination combination = new Combination(plugin);
                     combination.items.add(new SerializeItem(create_item));
                     combination.items.add(new SerializeItem(holder.item));
-                    new DatabaseComb(plugin).addValue(combination);
+                    new DatabaseComb(plugin).setValue(combination);
                     player.openInventory(new EditCombining_H(plugin, create_item, holder.item).getInventory());
                 }
             } else {
