@@ -43,7 +43,7 @@ public class EditCombining_L implements Listener {
             } else if (itemStack.equals(holder.enchantments)) {
                 player.openInventory(new ListEnchantments_H(plugin, combination).getInventory());
             } else if (itemStack.equals(holder.attributes)) {
-
+                player.openInventory(new ListAttributes_H(plugin, combination).getInventory());
             }
         }
     }
