@@ -19,6 +19,7 @@ public class DatabaseComb {
     public void setValue(Combination combination) {
         String sql = "INSERT OR REPLACE INTO combining (items, attributes) VALUES (?, ?)";
         try {
+            combination.sortItems();
             PreparedStatement stmt = connection.prepareStatement(sql);
             stmt.setString(1, combination.serializeItems());
             stmt.setString(2, combination.serializeAttributes());
@@ -27,8 +28,14 @@ public class DatabaseComb {
         } catch (Exception e) {e.printStackTrace();}
     }
     public void deleteValue(Combination combination) {
+        for(Combination value : getAllValues()){
+            if (value.items.equals(combination.items)){
+                combination = value;
+            }
+        }
         String sql = "DELETE FROM combining WHERE items=?";
         try {
+            combination.sortItems();
             PreparedStatement stmt = connection.prepareStatement(sql);
             stmt.setString(1, combination.serializeItems());
             stmt.executeUpdate();
@@ -39,13 +46,8 @@ public class DatabaseComb {
         Combination combination = new Combination(plugin);
         combination.items.add(new SerializeItem(item1));
         combination.items.add(new SerializeItem(item2));
-        String sql = "DELETE FROM combining WHERE items=?";
-        try {
-            PreparedStatement stmt = connection.prepareStatement(sql);
-            stmt.setString(1, combination.serializeItems());
-            stmt.executeUpdate();
-            stmt.close();
-        } catch (Exception e) {e.printStackTrace();}
+        combination.sortItems();
+        deleteValue(combination);
     }
     public List<Combination> getValues(SerializeItem item){
         List<Combination> list = new ArrayList<>();
@@ -60,6 +62,7 @@ public class DatabaseComb {
     }
     public Attributes getAttribute(Combination combination){
         try {
+            combination.sortItems();
             String sql = "SELECT attributes FROM combining WHERE items=?";
             PreparedStatement stmt = connection.prepareStatement(sql);
             stmt.setString(1, combination.serializeItems());
@@ -92,6 +95,7 @@ public class DatabaseComb {
         if (ignore_attributes) {
             for (Combination c : getAllValues()) {
                 if (c.items.equals(combination1.items)) {
+                    combination2.items = c.items;
                     combination2.attributes = c.attributes;
                 }
             }

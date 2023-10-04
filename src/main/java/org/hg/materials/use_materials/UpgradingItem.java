@@ -11,6 +11,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.hg.materials.Combination;
+import org.hg.materials.DatabaseComb;
 import org.hg.materials.Materials;
 import org.hg.materials.SerializeItem;
 import org.hg.materials.attributes.Attributes;
@@ -81,30 +83,9 @@ public class UpgradingItem {
                     }
                     lore.add(ChatColor.WHITE+"Наложен: "+material.getItemMeta().getDisplayName()+ChatColor.WHITE+" (x"+(amount+1)+")");
                     itemMeta.setLore(lore);
-                    for(Attribute attr : attributes.attribute.keySet()){
-                        for (AttributeModifier modifier: attributes.attribute.get(attr)) {
-                            double multiplier = 0;
-                            if (itemMeta.getAttributeModifiers() != null && itemMeta.getAttributeModifiers(attr) != null) {
-                                for (AttributeModifier e : itemMeta.getAttributeModifiers(attr)) {
-                                    if (e.getSlot() == modifier.getSlot()) {
-                                        multiplier += e.getAmount();
-                                        itemMeta.removeAttributeModifier(attr, e);
-                                    }
-                                }
-                            }
-                            itemMeta.addAttributeModifier(attr, new AttributeModifier(modifier.getUniqueId(), modifier.getName(), modifier.getAmount()+multiplier, modifier.getOperation(), modifier.getSlot()));
-                        }
-                    }
+                    applyAttributes(itemMeta, attributes);
                     itemMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, new SerializeItem(material).hash()), PersistentDataType.INTEGER, amount + 1);
-                    for (Enchantment enchantment_need: attributes.enchantment.keySet()){
-                        int multiplier = 0;
-                        if (itemMeta.hasEnchant(enchantment_need)){
-                            multiplier += itemMeta.getEnchants().get(enchantment_need).intValue();
-                            itemMeta.removeEnchant(enchantment_need);
-                        }
-                        multiplier += attributes.enchantment.get(enchantment_need).intValue();
-                        itemMeta.addEnchant(enchantment_need, multiplier, true);
-                    }
+                    searchAndApplyCombinations(itemMeta);
                 } else {
                     return new ItemStack(Material.AIR);
                 }
@@ -112,5 +93,49 @@ public class UpgradingItem {
             item.setItemMeta(itemMeta);
         }
         return item.clone();
+    }
+    public void applyAttributes(ItemMeta itemMeta, Attributes attributes){
+        for(Attribute attr : attributes.attribute.keySet()){
+            for (AttributeModifier modifier: attributes.attribute.get(attr)) {
+                double multiplier = 0;
+                if (itemMeta.getAttributeModifiers() != null && itemMeta.getAttributeModifiers(attr) != null) {
+                    for (AttributeModifier e : itemMeta.getAttributeModifiers(attr)) {
+                        if (e.getSlot() == modifier.getSlot()) {
+                            multiplier += e.getAmount();
+                            itemMeta.removeAttributeModifier(attr, e);
+                        }
+                    }
+                }
+                itemMeta.addAttributeModifier(attr, new AttributeModifier(modifier.getUniqueId(), modifier.getName(), modifier.getAmount()+multiplier, modifier.getOperation(), modifier.getSlot()));
+            }
+        }
+        for (Enchantment enchantment_need: attributes.enchantment.keySet()){
+            int multiplier = 0;
+            if (itemMeta.hasEnchant(enchantment_need)){
+                multiplier += itemMeta.getEnchants().get(enchantment_need).intValue();
+                itemMeta.removeEnchant(enchantment_need);
+            }
+            multiplier += attributes.enchantment.get(enchantment_need).intValue();
+            itemMeta.addEnchant(enchantment_need, multiplier, true);
+        }
+    }
+    public void searchAndApplyCombinations(ItemMeta itemMeta){
+        if (itemMeta != null) {
+            for (Combination combination : new DatabaseComb(plugin).getAllValues()) {
+                if (!itemMeta.getPersistentDataContainer().has(new NamespacedKey(plugin, combination.hashItems()), PersistentDataType.INTEGER)){
+                    boolean t = true;
+                    List<SerializeItem> serializeItemList = getApplyMaterials();
+                    for (SerializeItem serializeItem :combination.items){
+                        if(!serializeItemList.contains(serializeItem)){
+                            t = false;
+                        }
+                    }
+                    if (t){
+                        applyAttributes(itemMeta, combination.attributes);
+                        itemMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, combination.hashItems()), PersistentDataType.INTEGER, 1);
+                    }
+                }
+            }
+        }
     }
 }

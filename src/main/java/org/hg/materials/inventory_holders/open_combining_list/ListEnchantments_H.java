@@ -34,6 +34,7 @@ public class ListEnchantments_H implements InventoryHolder {
         this.page = page;
         this.plugin = plugin;
         this.combination = combination;
+        this.combination.sortItems();
         setDisplayName(accept, ChatColor.GREEN+"Подтвердить изменение зачарований");
         setDisplayName(deny, ChatColor.RED+"Отклонить изменения зачарований");
         setDisplayName(add_enchant, ChatColor.DARK_PURPLE+"Добавить зачарование");

@@ -22,11 +22,11 @@ public class ListEnchantments_L implements Listener {
             if (itemStack == null) {
                 return;
             }  else if (itemStack.equals(holder.deny)) {
-                player.openInventory(new EditCombining_H(holder.plugin, holder.combination.items.get(0).getItem(), holder.combination.items.get(1).getItem()).getInventory());
+                player.openInventory(new EditCombining_H(holder.plugin, holder.combination.items.get(1).getItem(), holder.combination.items.get(0).getItem()).getInventory());
             } else if (itemStack.equals(holder.accept)) {
                 new DatabaseComb(holder.plugin).deleteValue(holder.combination);
                 new DatabaseComb(holder.plugin).setValue(holder.combination);
-                player.openInventory(new EditCombining_H(holder.plugin, holder.combination.items.get(0).getItem(), holder.combination.items.get(1).getItem()).getInventory());
+                player.openInventory(new EditCombining_H(holder.plugin, holder.combination.items.get(1).getItem(), holder.combination.items.get(0).getItem()).getInventory());
             } else if (itemStack.equals(holder.add_enchant)) {
                 player.openInventory(new EditEnchant_H(holder.plugin, holder.combination).getInventory());
 //                player.openInventory(new EditEnchant(holder.plugin, holder.item, holder.attributes).getInventory());

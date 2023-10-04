@@ -10,20 +10,22 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class Combination {
     Materials plugin;
-    public ArrayList<SerializeItem> items = new ArrayList<>();
+    public List<SerializeItem> items = new ArrayList<>();
     public Attributes attributes = new Attributes();
     public Combination(Materials plugin){
         this.plugin = plugin;
+        items = new ArrayList<>();
+        attributes = new Attributes();
     }
-    public Combination(Materials plugin, ArrayList<SerializeItem> items, Attributes attributes){
+    public Combination(Materials plugin, List<SerializeItem> items, Attributes attributes){
         this.plugin = plugin;
         this.attributes = attributes;
         this.items = items;
@@ -32,13 +34,13 @@ public class Combination {
     public Combination(Materials plugin, String serialize_items, String serialize_attributes){
         this.plugin = plugin;
         this.attributes = new Attributes(serialize_attributes);
-        sortItems();
         ByteArrayInputStream inputStream = new ByteArrayInputStream(serialize_items.getBytes(StandardCharsets.ISO_8859_1));
         try {
             BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
-            this.items = (ArrayList<SerializeItem>) dataInput.readObject();
+            this.items = (List<SerializeItem>) dataInput.readObject();
+            this.sortItems();
             dataInput.close();
-        } catch (Exception e){}
+        } catch (Exception e){e.printStackTrace();}
     }
     public String serializeItems(){
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -53,7 +55,30 @@ public class Combination {
         }
         return new String(outputStream.toByteArray(), StandardCharsets.ISO_8859_1);
     }
+    public String hashItems(){
+        String input = serializeItems();
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedhash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder(2 * encodedhash.length);
+            for (byte b : encodedhash) {
+                hexString.append(String.format("%02x", b));
+            }
+            String hashedString = hexString.toString();
+            hashedString = hashedString.replaceAll("[^a-z0-9/._-]", "_");
+
+            return hashedString;
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
     public void sortItems(){
+        List<SerializeItem> list = new ArrayList<>();
+        for (SerializeItem item: items){
+            list.add(new SerializeItem(item.getItem()));
+        }
+        this.items = list;
         Collections.sort(items, SerializeItem::compareTo);
     }
     public String serializeAttributes(){

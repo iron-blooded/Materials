@@ -30,6 +30,7 @@ public class ListAttributes_H implements InventoryHolder {
     Combination combination;
     public ListAttributes_H(Materials plugin, Combination combination){
         this.plugin = plugin;
+        combination.sortItems();
         this.combination = combination;
         setDisplayName(accept, ChatColor.GREEN+"Подтвердить изменение атрибутов");
         setDisplayName(deny, ChatColor.RED+"Отклонить изменения атрибутов");

@@ -7,6 +7,6 @@ commands:
   open_material_list:
     permission: op
   apply_material:
-    permission: op
+    permission: blacksmith
   view_apply_materials:
-    permission: op
+    permission: blacksmith

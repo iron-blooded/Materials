@@ -31,6 +31,7 @@ public class EditCombining_L implements Listener {
             combination.items.add(new SerializeItem(holder.item_editing));
             combination.items.add(new SerializeItem(holder.item_comb));
             combination.attributes = new DatabaseComb(plugin).getAttribute(combination);
+            combination.sortItems();
             if (itemStack == null) {
                 return;
             } else if (itemStack.equals(holder.playback)) {

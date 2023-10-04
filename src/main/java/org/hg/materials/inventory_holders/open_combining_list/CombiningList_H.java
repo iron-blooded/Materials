@@ -18,7 +18,7 @@ import static org.hg.materials.Materials.createFlag;
 import static org.hg.materials.inventory_holders.materials_list.EditEnchant.setDisplayName;
 
 public class CombiningList_H implements InventoryHolder {
-    private Materials plugin;
+    Materials plugin;
     ItemStack item;
     public int page;
     public ItemStack left = createFlag(true);

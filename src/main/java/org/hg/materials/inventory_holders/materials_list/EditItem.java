@@ -51,7 +51,7 @@ public class EditItem implements InventoryHolder, Listener {
     public Inventory getInventory() {
         Inventory inventory = Bukkit.createInventory(this, InventoryType.DROPPER, ChatColor.DARK_AQUA+"Изменение материала");
         inventory.setItem(0, item);
-        inventory.setItem(1, combining);
+//        inventory.setItem(1, combining);
         inventory.setItem(2, enchantments);
         inventory.setItem(4, new trackpoint().create(this));
         inventory.setItem(5, delete);

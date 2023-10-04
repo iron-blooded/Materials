@@ -31,11 +31,12 @@ public class ListAttributes_L implements Listener {
             if (itemStack == null){
                 return;
             } else if (itemStack.equals(holder.deny)) {
-                player.openInventory(new EditCombining_H(holder.plugin, holder.combination.items.get(0).getItem(), holder.combination.items.get(1).getItem()).getInventory());
+                player.openInventory(new EditCombining_H(holder.plugin, holder.combination.items.get(1).getItem(), holder.combination.items.get(0).getItem()).getInventory());
             } else if (itemStack.equals(holder.accept)) {
-                new DatabaseComb(holder.plugin).deleteValue(holder.combination);
+//                new DatabaseComb(holder.plugin).deleteValue(holder.combination);
+                holder.combination.sortItems();
                 new DatabaseComb(holder.plugin).setValue(holder.combination);
-                player.openInventory(new EditCombining_H(holder.plugin, holder.combination.items.get(0).getItem(), holder.combination.items.get(1).getItem()).getInventory());
+                player.openInventory(new EditCombining_H(holder.plugin, holder.combination.items.get(1).getItem(), holder.combination.items.get(0).getItem()).getInventory());
             } else if (itemStack.equals(holder.add_attribute)) {
                 player.openInventory(new EditAttribute_H(holder.plugin, holder.combination).getInventory());
             } else if (itemStack.getType() == Material.EXPERIENCE_BOTTLE) {

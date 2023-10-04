@@ -1,5 +1,6 @@
 package org.hg.materials.inventory_holders.open_combining_list;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -36,18 +37,19 @@ public class CombiningList_L implements Listener {
                 holder.page += 1;
                 player.openInventory(holder.getInventory());
             } else if (itemStack.equals(holder.add_combining)) {
-                ItemStack create_item = null;
+                SerializeItem create_item = null;
                 for (SerializeItem serializeItem : plugin.database.getAllValues()){
                     if (!serializeItem.getItem().equals(holder.item)){
-                        create_item = serializeItem.getItem();
+                        create_item = serializeItem;
                     }
                 }
                 if (create_item != null){
                     Combination combination = new Combination(plugin);
-                    combination.items.add(new SerializeItem(create_item));
+                    combination.items.add(create_item);
                     combination.items.add(new SerializeItem(holder.item));
+                    combination.sortItems();
                     new DatabaseComb(plugin).setValue(combination);
-                    player.openInventory(new EditCombining_H(plugin, create_item, holder.item).getInventory());
+                    player.openInventory(new EditCombining_H(plugin, create_item.getItem(), holder.item).getInventory());
                 }
             } else {
                 player.openInventory(new EditCombining_H(plugin, itemStack, holder.item).getInventory());
